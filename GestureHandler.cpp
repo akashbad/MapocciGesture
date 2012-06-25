@@ -81,11 +81,7 @@ void GestureHandler::report(sensorData data)
 		oldTorso[i] = 0.6*rawData.torso[i] + .4*oldTorso[i];
 		oldStomach[i] = 0.6*rawData.stomach[i] + .4*oldStomach[i];
 		oldBottom[i] = 0.6*rawData.bottom[i] + .4*oldBottom[i];
-		
-		Serial.print(oldStomach[i]);
-		Serial.print('\t');
 	}
-	//Serial.println("");
 }
 
 //------------------------------------------------------------------------------
@@ -248,10 +244,10 @@ void GestureHandler::getTouchPadFeatures(float means[], float stds[], int modes[
 	}
 
 	//Get the means
-	//means[0] = ftfMean(oldTorso, 16);
-	//means[1] = ftfMean(oldBottom,16);
+	means[0] = ftfMean(oldTorso, 16);
+	means[1] = ftfMean(oldBottom,16);
 	means[2] = ftfMean(oldStomach, 16);
-	//means[4] = ftfMean(body, 48);
+	means[4] = ftfMean(body, 48);
 	
 	//Get the stds
 	stds[0] = ftfStd(oldTorso, 16);
@@ -265,7 +261,6 @@ void GestureHandler::getTouchPadFeatures(float means[], float stds[], int modes[
 	modes[2] = ftiMode(oldStomach, 16);
 	modes[4] = ftiMode(body, 48);
 	
-	Serial.println(means[2]);
 }
 
 String GestureHandler::getHug()

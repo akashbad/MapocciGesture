@@ -69,6 +69,10 @@ void SensorHandler::getTorsoData(int data[])
 		int temp = analogRead(torsoPin)-350;
 		data[i] = temp > 0 ? temp : 0;
 	}
+	for(int i=0; i<16; i++)
+	{
+		data[i] = removeDeadPixels(data, i, 16);
+	}
 }
 
 void SensorHandler::getStomachData(int data[])
@@ -85,6 +89,20 @@ void SensorHandler::getStomachData(int data[])
 	}
 }
 
+void SensorHandler::getBottomData(int data[])
+{
+	for(int i=0; i<8; i++)
+	{
+		bottomMultiplexer(i);
+		int temp = analogRead(bottomPin)-350;
+		data[i] = temp > 0 ? temp : 0;
+	}
+	for(int i=8; i<16; i++)
+	{
+		data[i] = 0;
+	}
+}
+
 int SensorHandler::removeDeadPixels(int data[], int index, int size)
 {
 	int head = index < size-1 ? index+1 : index-2;
@@ -98,17 +116,6 @@ int SensorHandler::removeDeadPixels(int data[], int index, int size)
 		return (data[head]+data[tail]) /2;
 	}
 	else return data[index];
-}
-
-
-void SensorHandler::getBottomData(int data[])
-{
-	for(int i=0; i<16; i++)
-	{
-		bottomMultiplexer(i);
-		int temp = analogRead(bottomPin)-350;
-		data[i] = temp > 0 ? temp : 0;
-	}
 }
 
 void SensorHandler::getLegsData(int data[])
