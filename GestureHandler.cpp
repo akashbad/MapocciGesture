@@ -87,12 +87,13 @@ void GestureHandler::report(sensorData data)
 //------------------------------------------------------------------------------
 String GestureHandler::getShaking()
 {
+	float x  = sqrt(pow(rawData.accel[0]-accelerometerNominal,2) + 
+			pow(rawData.accel[1]-accelerometerNominal,2) + 
+			pow(rawData.accel[2]-accelerometerNominal,2));
 	if(testShake(rawData.accel, shakingUpper)&&!isShaking&&shakeCount==5)
 	{
 		isShaking = true;
-		float x  = sqrt(pow(rawData.accel[0]-accelerometerNominal,2) + 
-					pow(rawData.accel[1]-accelerometerNominal,2) + 
-					pow(rawData.accel[2]-accelerometerNominal,2));
+
 		float force = x > strongestShake ? x : strongestShake;
 		return getShakeGesture(force);
 	}
@@ -100,9 +101,6 @@ String GestureHandler::getShaking()
 	{
 		shakeCount++;
 		shakeCount = shakeCount>5 ? 5 : shakeCount;
-		float x  = sqrt(pow(rawData.accel[0]-accelerometerNominal,2) + 
-							pow(rawData.accel[1]-accelerometerNominal,2) + 
-							pow(rawData.accel[2]-accelerometerNominal,2));
 		strongestShake = x > strongestShake ? x : strongestShake;
 	}
 	if(isShaking && shakeCount==0)
@@ -114,6 +112,10 @@ String GestureHandler::getShaking()
 	if(!testShake(rawData.accel, shakingLower)&&shakeCount>0)
 	{
 		shakeCount--;
+	}
+	if(isShaking)
+	{
+		return getShakeGesture(x);
 	}
 	return "";
 }
@@ -164,6 +166,14 @@ String GestureHandler::getRotating()
 		isSpinning = false;
 		gesture+= "Spin=ended:0.00!";
 	}
+	else if(isSpinning)
+	{
+		float force = transfer.transferSpinning(abs(rawData.gyro[0] - nominalRotation));
+		char temp[10];
+		dtostrf(force, 0, 3, temp);
+		String spin = "Spin=initiated:" + String(temp)+"!";
+		gesture+=spin;
+	}
 	
 	if(rotationAxis[1]&&!isFlipping)
 	{
@@ -179,6 +189,14 @@ String GestureHandler::getRotating()
 		isFlipping = false;
 		gesture+= "Flip=ended:0.00!";
 	}
+	else if(isFlipping)
+	{
+		float force = transfer.transferFlipping(abs(rawData.gyro[1] - nominalRotation));
+		char temp[10];
+		dtostrf(force, 0, 3, temp);
+		String flip = "Flip=initiated:" + String(temp)+"!";
+		gesture+=flip;
+	}
 	
 	if(rotationAxis[2]&&!isRolling)
 	{
@@ -193,6 +211,14 @@ String GestureHandler::getRotating()
 	{
 		isRolling = false;
 		gesture+= "Roll=ended:0.00!";
+	}
+	else if(isRolling)
+	{
+		float force = transfer.transferRolling(abs(rawData.gyro[2] - nominalRotation));
+		char temp[10];
+		dtostrf(force, 0, 3, temp);
+		String roll = "Roll=initiated:" + String(temp)+"!";
+		gesture+=roll;
 	}
 
 	return gesture;
@@ -221,6 +247,10 @@ String GestureHandler::getFalling()
 	}
 	else if(isFalling&&magnitude >20.0){
 		return "Falling=ended:0.00!";
+	}
+	if(isFalling)
+	{
+		return "Falling=started:0.00!";
 	}
 	return ("");
 }
@@ -297,10 +327,22 @@ String GestureHandler::getHug()
 	{
 		hugCount--;
 	}
+	if(isHugging)
+	{
+		float std = stds[3] > strongestHugStd ? stds[3] : strongestHugStd;
+		float mode = modes[3] > strongestHugMode ? modes[3] : strongestHugMode;
+		float force = transfer.transferHugging(std, mode);
+		char temp[10];
+		dtostrf(force, 0, 3, temp);
+		return "Hug=initiated:" + String(temp)+"!";
+	}
 	return ("");
 }
 
 //------------------------------------------------------------------------------
+//For petting we will not send intermediate information because it is somewhere
+//between a continuous gesture and an event based one, each pet may well be treated
+//as an event but it is still important to know when each starts and stops.
 String GestureHandler::getPet()
 {
 	float movement[3];
@@ -398,6 +440,14 @@ String GestureHandler::getHandHold()
 		if(!touch[i] && holdCount[i]>0)
 		{
 			holdCount[i]--;
+		}
+		if(isHolding[i])
+		{
+			float touchStrength = rawData.legs[i] > maxTouch[i] ? rawData.legs[i] : maxTouch[i];
+			float force = transfer.transferHold(touchStrength);
+			char temp[10];
+			dtostrf(force, 0, 3, temp);
+			gesture+="Touch-"+String(i)+"=initiated:"+String(temp)+"!";
 		}
 	}
 	return gesture;
