@@ -246,6 +246,7 @@ String GestureHandler::getFalling()
 		return "Falling=started:0.00!";
 	}
 	else if(isFalling&&magnitude >20.0){
+		isFalling = false;
 		return "Falling=ended:0.00!";
 	}
 	if(isFalling)
