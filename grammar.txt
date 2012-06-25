@@ -14,6 +14,6 @@ Grammar definitions:
 		| "Falling=initated" | "Falling=ended" | "Hug=initiated" | "Hug=ended"
 		| "Pet-torso=initiated" | "Pet-bottom=initiated" | "Pet-stomach=initated"
 		| "Pet-ended" | "Touch-" LEGNUM "=initiated" | "Touch-" LEGNUM "=ended"
-		| "Poke=detected" | "Slap-detected" | "Kiss-detected"
+		| "Poke=detected" | "Slap=detected" | "Kiss=detected"
 	LEG_NUMBER::= (0-3)
 	FORCE::= %f
