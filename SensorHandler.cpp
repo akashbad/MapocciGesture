@@ -30,7 +30,8 @@ SensorHandler::SensorHandler(int Apins[], int Gpins[], int FpinT, int FpinS, int
 		copyInt(legPins, TLpins, 4);
 		mouthPin = TpinM;
 		
-		deadPixThreshold = 500;
+		deadPixThreshold = 800;
+		
 		for(int i = 0; i<4; i++)
 		{
 			pinMode(torsoControl[i], OUTPUT);
@@ -66,7 +67,7 @@ void SensorHandler::getTorsoData(int data[])
 	for(int i=0; i<16; i++)
 	{
 		torsoMultiplexer(i);
-		int temp = analogRead(torsoPin)-350;
+		int temp = analogRead(torsoPin)-300;
 		data[i] = temp > 0 ? temp : 0;
 	}
 	for(int i=0; i<16; i++)
@@ -77,16 +78,20 @@ void SensorHandler::getTorsoData(int data[])
 
 void SensorHandler::getStomachData(int data[])
 {
+
 	for(int i=0; i<16; i++)
 	{
 		stomachMultiplexer(i);
-		int temp = analogRead(stomachPin)-350;
+		
+		int temp = analogRead(stomachPin);//-300;
 		data[i] = temp > 0 ? temp : 0;
+		
 	}
 	for(int i=0; i<16; i++)
 	{
 		data[i] = removeDeadPixels(data, i, 16);
 	}
+	
 }
 
 void SensorHandler::getBottomData(int data[])
@@ -94,7 +99,7 @@ void SensorHandler::getBottomData(int data[])
 	for(int i=0; i<8; i++)
 	{
 		bottomMultiplexer(i);
-		int temp = analogRead(bottomPin)-350;
+		int temp = analogRead(bottomPin)-300;
 		data[i] = temp > 0 ? temp : 0;
 	}
 	for(int i=8; i<16; i++)
