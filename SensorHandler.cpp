@@ -83,7 +83,7 @@ void SensorHandler::getStomachData(int data[])
 	{
 		stomachMultiplexer(i);
 		
-		int temp = analogRead(stomachPin);//-300;
+		int temp = analogRead(stomachPin)-300;
 		data[i] = temp > 0 ? temp : 0;
 		
 	}
