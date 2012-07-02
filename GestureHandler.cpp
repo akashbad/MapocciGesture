@@ -373,7 +373,7 @@ String GestureHandler::getPet()
 			isPetting = true;
 			petCount[(i+1)%3] = -1;
 			petCount[(i+2)%3] = -1;
-			Serial.println("over here!");
+			Serial.println("on!");
 			int mode = modes[i] > strongestPetMode[i] ? modes[i] : strongestPetMode[i];
 			float speed = movement[i] > fastestPetSpeed[i] ? movement[i] : fastestPetSpeed[i];
 			return getPetGesture(i, mode, speed);
@@ -381,7 +381,7 @@ String GestureHandler::getPet()
 		if(movement[i]>petThresholdHigh && petCount[i]>=0)
 		{
 			petCount[i]+=5;
-			Serial.println("here!");
+			//Serial.println("here!");
 			petCount[i] = petCount[i]>15 ? 15 : petCount[i];
 			strongestPetMode[i] = modes[i] > strongestPetMode[i] ? modes[i] : strongestPetMode[i];
 			fastestPetSpeed[i] = movement[i] > fastestPetSpeed[i] ? movement[i] : fastestPetSpeed[i];
@@ -393,7 +393,7 @@ String GestureHandler::getPet()
 			fastestPetSpeed[i] = 0.0;
 			petCount[(i+1)%3] = 0;
 			petCount[(i+2)%3] = 0;
-			Serial.println("now here!");
+			Serial.println("off!");
 			return "Pet=ended:0.00!";
 		}
 		if(movement[i]<petThresholdLow && petCount[i]>0)
