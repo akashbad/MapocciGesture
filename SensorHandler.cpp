@@ -30,7 +30,7 @@ SensorHandler::SensorHandler(int Apins[], int Gpins[], int FpinT, int FpinS, int
 		copyInt(legPins, TLpins, 4);
 		mouthPin = TpinM;
 		
-		deadPixThreshold = 800;
+		deadPixThreshold = 500;
 		
 		for(int i = 0; i<4; i++)
 		{
