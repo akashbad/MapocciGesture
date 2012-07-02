@@ -27,7 +27,7 @@ GestureHandler::GestureHandler(MapocciTransfer model)
 	isShaking = false;
 	shakeCount = 0;
 	shakePointer = 0;
-	shakingUpper = 10.0;
+	shakingUpper = 20.0;
 	shakingLower = 10.0;
 	accelerometerNominal = 338;
 	
