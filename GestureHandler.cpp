@@ -403,7 +403,13 @@ String GestureHandler::getPet()
 	}
 	//if(movement[2] > 2.00)
 	//{
-		Serial.println(means[2] - lastMeans[2]);
+		Serial.print(means[2] - lastMeans[2]);
+		Serial.print('\t');
+		Serial.print(means[2]);
+		Serial.print('\t');
+		Serial.print(stds[2]);
+		Serial.print('\t');
+		Serial.println(modes[2]);
 	//}
 	//Serial.println(petCount[2]);
 	return "";
