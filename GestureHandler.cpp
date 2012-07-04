@@ -51,8 +51,8 @@ GestureHandler::GestureHandler(MapocciTransfer model)
 	hugCount = 0;
 	isHugging = false;
 	
-	petThresholdHigh = 2.00;
-	petThresholdLow  = 0.20;
+	petThresholdHigh = 5.00;
+	petThresholdLow  = 1.0;
 	isPetting = false;
 	petCount[0] = 0;
 	petCount[1] = 0;
@@ -368,50 +368,58 @@ String GestureHandler::getPet()
 	for(int i=0; i<3; i++)
 	{
 		movement[i] = fabs(means[i] - lastMeans[i]);
-		if(movement[i]>petThresholdHigh && !isPetting &&petCount[i]>10)
+		if(movement[i]<petThresholdHigh)
 		{
-			isPetting = true;
-			petCount[(i+1)%3] = -1;
-			petCount[(i+2)%3] = -1;
-			Serial.println("on!");
-			int mode = modes[i] > strongestPetMode[i] ? modes[i] : strongestPetMode[i];
-			float speed = movement[i] > fastestPetSpeed[i] ? movement[i] : fastestPetSpeed[i];
-			return getPetGesture(i, mode, speed);
-		}
-		if(movement[i]>petThresholdHigh && petCount[i]>=0)
-		{
-			petCount[i]+=5;
-			//Serial.println("here!");
-			petCount[i] = petCount[i]>15 ? 15 : petCount[i];
-			strongestPetMode[i] = modes[i] > strongestPetMode[i] ? modes[i] : strongestPetMode[i];
-			fastestPetSpeed[i] = movement[i] > fastestPetSpeed[i] ? movement[i] : fastestPetSpeed[i];
-		}
-		if(isPetting && petCount[i] == 0)
-		{
-			isPetting = false;
-			strongestPetMode[i] = 0;
-			fastestPetSpeed[i] = 0.0;
-			petCount[(i+1)%3] = 0;
-			petCount[(i+2)%3] = 0;
-			Serial.println("off!");
-			return "Pet=ended:0.00!";
-		}
-		if(movement[i]<petThresholdLow && petCount[i]>0)
-		{
-			petCount[i]--;
+			if(abs(movement[i])>0.01)
+			{
+				filtered[i] = filtered[i] * 0.4 + 1;
+			}
+			else
+			{
+				filtered[i] = filtered[i] * 0.4;
+			}
+			if(filtered[i] >= petThresholdLow && !isPetting && petCount[i]>15)
+			{
+				isPetting = true;
+				petCount[(i+1)%3] = -1;
+				petCount[(i+2)%3] = -1;
+				Serial.println("TTTTTTTTTTTTTTTTTTTT!");
+				int mode = modes[i] > strongestPetMode[i] ? modes[i] : strongestPetMode[i];
+				float speed = movement[i] > fastestPetSpeed[i] ? movement[i] : fastestPetSpeed[i];
+				return getPetGesture(i, mode, speed);
+			}
+			if(filtered[i]>=petThresholdLow && petCount[i]>=0)
+			{
+				petCount[i]++;
+				petCount[i] = petCount[i] > 20 ? 20 : petCount[i];
+				strongestPetMode[i] = modes[i] > strongestPetMode[i] ? modes[i] : strongestPetMode[i];
+				fastestPetSpeed[i] = movement[i] > fastestPetSpeed[i] ? movement[i] : fastestPetSpeed[i];
+			}
+			if(isPetting && petCount[i] < 15)
+			{
+				isPetting = false;
+				strongestPetMode[i] = 0;
+				fastestPetSpeed[i] = 0.0;
+				petCount[(i+1)%3] = 0;
+				petCount[(i+2)%3] = 0;
+				Serial.println("MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM!");
+				return "Pet=ended:0.00!";
+			}
+			if(filtered[i] < petThresholdLow && petCount[i] >0)
+			{
+				petCount[i]--;
+			}
+			
 		}
 	}
-	//if(movement[2] > 2.00)
-	//{
-		Serial.print(means[2] - lastMeans[2]);
-		Serial.print('\t');
-		Serial.print(means[2]);
-		Serial.print('\t');
-		Serial.print(stds[2]);
-		Serial.print('\t');
-		Serial.println(modes[2]);
-	//}
-	//Serial.println(petCount[2]);
+		// Serial.print(means[2] - lastMeans[2]);
+		// Serial.print('\t');
+		// Serial.print(means[2]);
+		// Serial.print('\t');
+		// Serial.print(stds[2]);
+		// Serial.print('\t');
+		// Serial.println(modes[2]);
+	Serial.println(filtered[2]);
 	return "";
 }
 

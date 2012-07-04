@@ -116,6 +116,7 @@ class GestureHandler
 		float petThresholdHigh;
 		float petThresholdLow;
 		float petCount[3];
+		float filtered[3];
 		bool isPetting;
 		int strongestPetMode[3];
 		float fastestPetSpeed[3];
