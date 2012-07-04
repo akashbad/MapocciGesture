@@ -88,8 +88,8 @@ void GestureHandler::report(sensorData data)
 		oldTorso[i] = 0.6*rawData.torso[i] + .4*oldTorso[i];
 		oldStomach[i] = 0.6*rawData.stomach[i] + .4*oldStomach[i];
 		oldBottom[i] = 0.6*rawData.bottom[i] + .4*oldBottom[i];
-		//Serial.print(oldStomach[i]);
-		//Serial.print('\t');
+		Serial.print(oldStomach[i]);
+		Serial.print('\t');
 	}
 	//Serial.print("|\t");
 	//Serial.println("");
@@ -303,13 +303,13 @@ void GestureHandler::getTouchPadFeatures(float means[], float stds[], int modes[
 	modes[2] = ftiMode(oldStomach, 16);
 	modes[4] = ftiMode(body, 48);
 	
-	//Serial.print(means[2]);
-	//Serial.print('\t');
+	Serial.print(means[2]);
+	Serial.print('\t');
 	//Serial.print("\t|\t");
-	//Serial.print(stds[2]);
-	//Serial.print('\t');
+	Serial.print(stds[2]);
+	Serial.print('\t');
 	//Serial.print("\t|\t");
-	//Serial.println(modes[2]);
+	Serial.print(modes[2]);
 }
 
 String GestureHandler::getHug()
@@ -395,14 +395,14 @@ String GestureHandler::getPet()
 				strongestPetMode[i] = modes[i] > strongestPetMode[i] ? modes[i] : strongestPetMode[i];
 				fastestPetSpeed[i] = movement[i] > fastestPetSpeed[i] ? movement[i] : fastestPetSpeed[i];
 			}
-			if(isPetting && petCount[i] < 15)
+			if(isPetting && petCount[i] < 10 && petCount[i] >=0)
 			{
 				isPetting = false;
 				strongestPetMode[i] = 0;
 				fastestPetSpeed[i] = 0.0;
 				petCount[(i+1)%3] = 0;
 				petCount[(i+2)%3] = 0;
-				Serial.println("MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM!");
+				//Serial.println("MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM!");
 				return "Pet=ended:0.00!";
 			}
 			if(filtered[i] < petThresholdLow && petCount[i] >0)
@@ -412,13 +412,15 @@ String GestureHandler::getPet()
 			
 		}
 	}
-		// Serial.print(means[2] - lastMeans[2]);
-		// Serial.print('\t');
-		// Serial.print(means[2]);
-		// Serial.print('\t');
-		// Serial.print(stds[2]);
-		// Serial.print('\t');
-		// Serial.println(modes[2]);
+	//Serial.print('\t');
+		Serial.print(means[2] - lastMeans[2]);
+		
+		 //Serial.print(means[2]);
+		 //Serial.print('\t');
+		 //Serial.print(stds[2]);
+		 //Serial.print('\t');
+		 //Serial.print(modes[2]);
+		 Serial.print('\t');
 	Serial.println(filtered[2]);
 	return "";
 }
