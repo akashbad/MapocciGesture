@@ -30,7 +30,7 @@ SensorHandler::SensorHandler(int Apins[], int Gpins[], int FpinT, int FpinS, int
 		copyInt(legPins, TLpins, 4);
 		mouthPin = TpinM;
 		
-		deadPixThreshold = 500;
+		deadPixThreshold = 400;
 		
 		for(int i = 0; i<4; i++)
 		{
@@ -82,8 +82,7 @@ void SensorHandler::getStomachData(int data[])
 	for(int i=0; i<16; i++)
 	{
 		stomachMultiplexer(i);
-		
-		int temp = analogRead(stomachPin)-300;
+		int temp = analogRead(stomachPin)-260;
 		data[i] = temp > 0 ? temp : 0;
 		
 	}
