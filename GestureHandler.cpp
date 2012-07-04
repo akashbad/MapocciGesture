@@ -78,9 +78,17 @@ void GestureHandler::report(sensorData data)
 	getTouchPadFeatures(means, stds, modes);
 	for(int i=0; i<16; i++)
 	{
-		oldTorso[i] = 0.6*rawData.torso[i] + .4*oldTorso[i];
-		oldStomach[i] = 0.6*rawData.stomach[i] + .4*oldStomach[i];
-		oldBottom[i] = 0.6*rawData.bottom[i] + .4*oldBottom[i];
+		oldTorso[i] = 0.4*rawData.torso[i] + .6*oldTorso[i];
+		float difference = fabs(rawData.stomach[i] - oldStomach[i]);
+		if(difference > 50)
+		{
+			oldStomach[i] = 0.05*rawData.stomach[i] + .95*oldStomach[i];
+		}
+		else
+		{
+			oldStomach[i] = 0.4*rawData.stomach[i] + .6*oldStomach[i];
+		}
+		oldBottom[i] = 0.4*rawData.bottom[i] + .6*oldBottom[i];
 		Serial.print(oldStomach[i]);
 		Serial.print('\t');
 	}
