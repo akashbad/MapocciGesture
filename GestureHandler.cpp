@@ -86,7 +86,7 @@ void GestureHandler::report(sensorData data)
 	for(int i=0; i<16; i++)
 	{
 		oldTorso[i] = 0.4*rawData.torso[i] + .6*oldTorso[i];
-		float difference = fabs(rawData.stomach[i] - oldStomach[i]);
+		float difference = rawData.stomach[i] - oldStomach[i];
 		if(difference > 50)
 		{
 			oldStomach[i] = 0.05*rawData.stomach[i] + .95*oldStomach[i];
@@ -95,6 +95,7 @@ void GestureHandler::report(sensorData data)
 		{
 			oldStomach[i] = 0.4*rawData.stomach[i] + .6*oldStomach[i];
 		}
+		// oldStomach[i] = rawData.stomach[i];
 		oldBottom[i] = 0.4*rawData.bottom[i] + .6*oldBottom[i];
 		Serial.print(oldStomach[i]);
 		Serial.print('\t');
