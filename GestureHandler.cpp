@@ -88,7 +88,7 @@ void GestureHandler::report(sensorData data)
 		{
 			oldStomach[i] = 0.4*rawData.stomach[i] + .6*oldStomach[i];
 		}
-		// oldStomach[i] = rawData.stomach[i];
+		oldStomach[i] = rawData.stomach[i];
 		oldBottom[i] = 0.4*rawData.bottom[i] + .6*oldBottom[i];
 		Serial.print(oldStomach[i]);
 		Serial.print('\t');
