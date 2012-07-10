@@ -82,26 +82,31 @@ GestureHandler::GestureHandler(MapocciTransfer model)
 void GestureHandler::report(sensorData data)
 {
 	rawData = data;
-	getTouchPadFeatures(means, stds, modes);
 	for(int i=0; i<16; i++)
 	{
-		oldTorso[i] = 0.4*rawData.torso[i] + .6*oldTorso[i];
-		float difference = rawData.stomach[i] - oldStomach[i];
-		if(difference > 50)
-		{
-			oldStomach[i] = 0.05*rawData.stomach[i] + .95*oldStomach[i];
-		}
-		else
-		{
-			oldStomach[i] = 0.4*rawData.stomach[i] + .6*oldStomach[i];
-		}
-		// oldStomach[i] = rawData.stomach[i];
+		// oldTorso[i] = 0.4*rawData.torso[i] + .6*oldTorso[i];
+		// float difference = rawData.stomach[i] - oldStomach[i];
+		// if(difference > 50)
+		// {
+			// oldStomach[i] = 0.05*rawData.stomach[i] + .95*oldStomach[i];
+		// }
+		// else
+		// {
+			// oldStomach[i] = 0.4*rawData.stomach[i] + .6*oldStomach[i];
+		// }
+		oldStomach[i] = rawData.stomach[i];
 		oldBottom[i] = 0.4*rawData.bottom[i] + .6*oldBottom[i];
 		Serial.print(oldStomach[i]);
 		Serial.print('\t');
 	}
+	getTouchPadFeatures(means, stds, modes);
 	//Serial.print("|\t");
 	//Serial.println("");
+	Serial.print(rawData.accel[0]);
+	Serial.print('\t');
+	Serial.print(rawData.accel[1]);
+	Serial.print('\t');
+	Serial.println(rawData.accel[2]);
 }
 
 //------------------------------------------------------------------------------
@@ -312,13 +317,13 @@ void GestureHandler::getTouchPadFeatures(float means[], float stds[], int modes[
 	modes[2] = ftiMode(oldStomach, 16);
 	modes[4] = ftiMode(body, 48);
 	
-	Serial.print(means[2]);
-	Serial.print('\t');
+	// Serial.print(means[2]);
+	// Serial.print('\t');
 	//Serial.print("\t|\t");
-	Serial.print(stds[2]);
-	Serial.print('\t');
+	// Serial.print(stds[2]);
+	// Serial.print('\t');
 	//Serial.print("\t|\t");
-	Serial.print(modes[2]);
+	// Serial.print(modes[2]);
 }
 
 String GestureHandler::getHug()
@@ -379,7 +384,7 @@ String GestureHandler::getPet()
 		movement[i] = fabs(means[i] - lastMeans[i]);
 		if(movement[i]<petThresholdHigh)
 		{
-			if(abs(movement[i])>0.01)
+			if(movement[i]>0.01)
 			{
 				filtered[i] = filtered[i] * 0.4 + 1;
 			}
@@ -392,7 +397,7 @@ String GestureHandler::getPet()
 				isPetting = true;
 				petCount[(i+1)%3] = -1;
 				petCount[(i+2)%3] = -1;
-				Serial.println("TTTTTTTTTTTTTTTTTTTT!");
+				// Serial.println("TTTTTTTTTTTTTTTTTTTT!");
 				int mode = modes[i] > strongestPetMode[i] ? modes[i] : strongestPetMode[i];
 				float speed = movement[i] > fastestPetSpeed[i] ? movement[i] : fastestPetSpeed[i];
 				return getPetGesture(i, mode, speed);
@@ -422,15 +427,15 @@ String GestureHandler::getPet()
 		}
 	}
 	//Serial.print('\t');
-		Serial.print(means[2] - lastMeans[2]);
+		//Serial.println(means[2] - lastMeans[2]);
 		
 		 //Serial.print(means[2]);
 		 //Serial.print('\t');
 		 //Serial.print(stds[2]);
 		 //Serial.print('\t');
 		 //Serial.print(modes[2]);
-		 Serial.print('\t');
-	Serial.println(filtered[2]);
+		 //Serial.print('\t');
+	//Serial.println(filtered[2]); 
 	return "";
 }
 
