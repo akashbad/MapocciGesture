@@ -83,13 +83,13 @@ void SensorHandler::getStomachData(int data[])
 	{
 		stomachMultiplexer(i);
 		
-		int temp = analogRead(stomachPin)-260;
+		int temp = analogRead(stomachPin);//-260;
 		data[i] = temp > 0 ? temp : 0;
 		
 	}
 	for(int i=0; i<16; i++)
 	{
-		data[i] = removeDeadPixels(data, i, 16);
+		//data[i] = removeDeadPixels(data, i, 16);
 	}
 	
 }
