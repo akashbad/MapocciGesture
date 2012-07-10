@@ -27,7 +27,7 @@ GestureHandler::GestureHandler(MapocciTransfer model)
 	isShaking = false;
 	shakeCount = 0;
 	shakePointer = 0;
-	shakingUpper = 20.0;
+	shakingUpper = 15.0;
 	shakingLower = 10.0;
 	accelerometerNominal = 338;
 	
@@ -40,6 +40,7 @@ GestureHandler::GestureHandler(MapocciTransfer model)
 	
 	//Falling variable initialization
 	isFalling = false;
+	fallCount = 0;
 	
 	//Hug variable initialization
 	hugModeThresholdHigh;
@@ -90,7 +91,7 @@ String GestureHandler::getShaking()
 	float x  = sqrt(pow(rawData.accel[0]-accelerometerNominal,2) + 
 			pow(rawData.accel[1]-accelerometerNominal,2) + 
 			pow(rawData.accel[2]-accelerometerNominal,2));
-	if(testShake(rawData.accel, shakingUpper)&&!isShaking&&shakeCount==5)
+	if(testShake(rawData.accel, shakingUpper)&&!isShaking&&!isFalling&&shakeCount==5)
 	{
 		isShaking = true;
 
@@ -245,9 +246,17 @@ String GestureHandler::getFalling()
 		isFalling = true;
 		return "Falling=started:0.00!";
 	}
-	else if(isFalling&&magnitude >20.0){
+	else if(magnitude < 10.0)
+	{
+		fallCount++;
+	}
+	else if(isFalling&&magnitude >20.0 && fallCount == 0){
 		isFalling = false;
 		return "Falling=ended:0.00!";
+	}
+	else if(magnitude > 20.0 && fallCount > 0)
+	{
+		fallCount--;
 	}
 	if(isFalling)
 	{

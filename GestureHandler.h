@@ -82,6 +82,7 @@ class GestureHandler
 		
 		//Helper variables for falling
 		bool isFalling;
+		int fallCount;
 		
 		//Helper function for the touchPads
 		void getTouchPadFeatures(float means[], float stds[], int modes[]);
