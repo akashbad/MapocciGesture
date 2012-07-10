@@ -75,9 +75,9 @@ float floatSum(float data[], int length)
 }
 
 //The float valued int mean method
-float ftfMean(float data[], int length)
+float ftfMean(int data[], int length)
 {
-	float sum = floatSum(data, length);
+	int sum = intSum(data, length);
 	float mean = 0.0;
 	for(int i=0; i<length; i++)
 	{
@@ -89,19 +89,20 @@ float ftfMean(float data[], int length)
 }
 
 //The float values int std method
-float ftfStd(float data[], int length)
+float ftfStd(int data[], int length)
 {
+	int sum = intSum(data, length);
 	float mean = ftfMean(data, length);
 	float variance = 0.0;
 	for(int i=0; i<length; i++)
 	{
 		variance += data[i]*pow(i-mean,2);
 	}
-	return sqrt(variance);
+	return sqrt(variance/sum);
 }
 
 //The int mode method
-int ftiMode(float data[], int length)
+int ftiMode(int data[], int length)
 {
 	int mode = 0;
 	for(int i=1; i<length; i++)
@@ -109,6 +110,14 @@ int ftiMode(float data[], int length)
 		mode = data[i]>data[mode] ? i : mode;
 	}
 	return mode;
+}
+
+//The float to string method
+String ftos(float input)
+{
+	char temp[10];
+	dtostrf(input, 0, 3, temp);
+	return String(temp);
 }
 	
 	

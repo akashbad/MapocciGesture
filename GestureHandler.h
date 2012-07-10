@@ -40,13 +40,9 @@ class GestureHandler
 		String getShaking();
 		String getRotating();
 		String getFalling();
-		String getHug();
-		String getPet();
-		String getScratch();
+		String getUpsideDown();
+		String getTouching();
 		String getHandHold();
-		String getFeed();
-		String getPoke();
-		String getSlap();
 		String getKiss();
 		
 		void update();
@@ -57,11 +53,10 @@ class GestureHandler
 		
 		//Helper methods for shaking
 		bool testShake(int current[], float threshold);
-		String getShakeGesture(float amplitude);
 		
 		//Helper variables for shaking, save state and such
 		int pastAccel[3];
-		float strongestShake;
+		float filteredShake;
 		bool isShaking;
 		int shakeCount;
 		int shakePointer;
@@ -83,43 +78,26 @@ class GestureHandler
 		//Helper variables for falling
 		bool isFalling;
 		
+		//Helper variable for upside down
+		bool isUpsideDown;
+		
 		//Helper function for the touchPads
 		void getTouchPadFeatures(float means[], float stds[], int modes[]);
 		
 		//Helper variables for each of the touchPads
-		float means[4];
-		float stds[4];
-		int modes[4];
+		float means[3];
+		float stds[3];
+		int modes[3];
+		int sums[3];
 		
-		float oldTorso[16];
-		float oldStomach[16];
-		float oldBottom[16];
+		int oldTorso[16];
+		int oldBottom[9];
+		int oldStomach[4];
 		
-		float lastMeans[4];
-		float lastStds[4];
-		int lastModes[4];
+		//Touch detection variables
+		int touchCount[3];
+		bool isTouching[3];
 		
-		//Hug detection variables
-		int hugModeThresholdHigh;
-		float hugStdThresholdHigh;
-		int hugModeThresholdLow;
-		float hugStdThresholdLow;
-		float strongestHugStd;
-		int strongestHugMode;
-		int hugCount;
-		bool isHugging;
-		
-		//Pet helper functions
-		String getPetGesture(int position, int mode, float speed);
-		
-		//Scratch detection variables
-		float petThresholdHigh;
-		float petThresholdLow;
-		float petCount[3];
-		float filtered[3];
-		bool isPetting;
-		int strongestPetMode[3];
-		float fastestPetSpeed[3];
 		
 		//Hand hold helper variables
 		float legsThreshold;

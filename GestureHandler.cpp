@@ -25,6 +25,7 @@ GestureHandler::GestureHandler(MapocciTransfer model)
 
 	//Shaking variables initialization
 	isShaking = false;
+	filteredShake = 0.00;
 	shakeCount = 0;
 	shakePointer = 0;
 	shakingUpper = 10.0;
@@ -41,22 +42,8 @@ GestureHandler::GestureHandler(MapocciTransfer model)
 	//Falling variable initialization
 	isFalling = false;
 	
-	//Hug variable initialization
-	hugModeThresholdHigh;
-	hugStdThresholdHigh;
-	hugModeThresholdLow;
-	hugStdThresholdLow;
-	strongestHugStd = 0.0;
-	strongestHugMode = 0;
-	hugCount = 0;
-	isHugging = false;
-	
-	petThresholdHigh = 5.00;
-	petThresholdLow  = 1.0;
-	isPetting = false;
-	petCount[0] = 0;
-	petCount[1] = 0;
-	petCount[2] = 0;
+	//Upside down variable initialization
+	isUpsideDown = false;
 	
 	//Hand hold variable initialization
 	legsThreshold;
@@ -67,13 +54,6 @@ GestureHandler::GestureHandler(MapocciTransfer model)
 		holdCount[i] = 0;
 	}
 	
-	//Poke variable initialization
-	pokeStdThreshold;
-	pokeModeThreshold;
-	
-	//Slap variable initialization
-	slapStdThreshold;
-	slapStdThreshold;
 	
 	//Kiss variable initialization
 	kissThreshold;
@@ -82,31 +62,22 @@ GestureHandler::GestureHandler(MapocciTransfer model)
 void GestureHandler::report(sensorData data)
 {
 	rawData = data;
-	for(int i=0; i<16; i++)
+	for(int i=0; i<9; i++)
 	{
-		// oldTorso[i] = 0.4*rawData.torso[i] + .6*oldTorso[i];
-		// float difference = rawData.stomach[i] - oldStomach[i];
-		// if(difference > 50)
-		// {
-			// oldStomach[i] = 0.05*rawData.stomach[i] + .95*oldStomach[i];
-		// }
-		// else
-		// {
-			// oldStomach[i] = 0.4*rawData.stomach[i] + .6*oldStomach[i];
-		// }
-		oldStomach[i] = rawData.stomach[i];
-		oldBottom[i] = 0.4*rawData.bottom[i] + .6*oldBottom[i];
-		Serial.print(oldStomach[i]);
-		Serial.print('\t');
+		oldTorso[i] = rawData.torso[i] > 20 ? rawData.torso[i] : 0;
+		oldBottom[i] = rawData.bottom[i] > 20 ? rawData.bottom[i] : 0;
+		oldStomach[i] = rawData.stomach[i] > 20 ? rawData.stomach[i] : 0;
+	}
+	for(int i=9; i<14; i++)
+	{
+		oldTorso[i] = rawData.torso[i] > 20 ? rawData.torso[i] : 0;
+		oldStomach[i] = rawData.stomach[i] > 20 ? rawData.stomach[i] : 0;
+	}
+	for(int i=14; i<16; i++)
+	{
+		oldTorso[i] = rawData.torso[i] > 20 ? rawData.torso[i] : 0;
 	}
 	getTouchPadFeatures(means, stds, modes);
-	//Serial.print("|\t");
-	//Serial.println("");
-	Serial.print(rawData.accel[0]);
-	Serial.print('\t');
-	Serial.print(rawData.accel[1]);
-	Serial.print('\t');
-	Serial.println(rawData.accel[2]);
 }
 
 //------------------------------------------------------------------------------
@@ -115,24 +86,27 @@ String GestureHandler::getShaking()
 	float x  = sqrt(pow(rawData.accel[0]-accelerometerNominal,2) + 
 			pow(rawData.accel[1]-accelerometerNominal,2) + 
 			pow(rawData.accel[2]-accelerometerNominal,2));
+	int axis = ftiMode(rawData.accel, 3);
 	if(testShake(rawData.accel, shakingUpper)&&!isShaking&&shakeCount==5)
 	{
 		isShaking = true;
 
-		float force = x > strongestShake ? x : strongestShake;
-		return getShakeGesture(force);
+		filteredShake = x*0.6 + filteredShake*0.4;
+		float force = transfer.transferShaking(filteredShake);
+		return "Shake=initiated:Acceleration=" + ftos(force) + 
+			":Axis=" + String(axis)+"!";
 	}
 	if(testShake(rawData.accel, shakingUpper))
 	{
 		shakeCount++;
 		shakeCount = shakeCount>5 ? 5 : shakeCount;
-		strongestShake = x > strongestShake ? x : strongestShake;
+		filteredShake = x*0.6 + filteredShake*0.4;
 	}
 	if(isShaking && shakeCount==0)
 	{
 		isShaking = false;
-		strongestShake = 0.0;
-		return "Shake=ended:0.00!";
+		filteredShake = 0.00;
+		return "Shake=ended!";
 	}
 	if(!testShake(rawData.accel, shakingLower)&&shakeCount>0)
 	{
@@ -140,7 +114,9 @@ String GestureHandler::getShaking()
 	}
 	if(isShaking)
 	{
-		return getShakeGesture(x);
+		float force = transfer.transferShaking(filteredShake);
+		return "Shake=initiated:Acceleration=" + ftos(force) + 
+			":Axis=" + String(axis)+"!";
 	}
 	return "";
 }
@@ -158,15 +134,6 @@ bool GestureHandler::testShake(int current[], float threshold)
 	return x;
 }
 
-String GestureHandler::getShakeGesture(float amplitude)
-{
-		float force = transfer.transferShaking(amplitude);
-		char temp[10];
-		dtostrf(force, 0, 3, temp);
-		String gesture = "Shake=initiated:" + String(temp)+"!";
-		return (gesture);
-}
-
 //------------------------------------------------------------------------------
 String GestureHandler::getRotating()
 {
@@ -180,69 +147,57 @@ String GestureHandler::getRotating()
 	if(rotationAxis[0]&&!isSpinning)
 	{
 		float force = transfer.transferSpinning(abs(rawData.gyro[0] - nominalRotation));
-		char temp[10];
-		dtostrf(force, 0, 3, temp);
-		String spin = "Spin=initiated:" + String(temp)+"!";
+		String spin = "Spin=initiated:Speed=" + ftos(force)+"!";
 		gesture+=spin;
 		isSpinning = true;
 	}
 	else if(!rotationAxis[0]&&isSpinning)
 	{
 		isSpinning = false;
-		gesture+= "Spin=ended:0.00!";
+		gesture+= "Spin=ended!";
 	}
 	else if(isSpinning)
 	{
 		float force = transfer.transferSpinning(abs(rawData.gyro[0] - nominalRotation));
-		char temp[10];
-		dtostrf(force, 0, 3, temp);
-		String spin = "Spin=initiated:" + String(temp)+"!";
+		String spin = "Spin=initiated:Speed=" + ftos(force)+"!";
 		gesture+=spin;
 	}
 	
 	if(rotationAxis[1]&&!isFlipping)
 	{
 		float force = transfer.transferFlipping(abs(rawData.gyro[1] - nominalRotation));
-		char temp[10];
-		dtostrf(force, 0, 3, temp);
-		String flip = "Flip=initiated:" + String(temp)+"!";
+		String flip = "Flip=initiated:Speed=" + ftos(force)+"!";
 		gesture+=flip;
 		isFlipping = true;
 	}
 	else if(!rotationAxis[1]&&isFlipping)
 	{
 		isFlipping = false;
-		gesture+= "Flip=ended:0.00!";
+		gesture+= "Flip=ended!";
 	}
 	else if(isFlipping)
 	{
 		float force = transfer.transferFlipping(abs(rawData.gyro[1] - nominalRotation));
-		char temp[10];
-		dtostrf(force, 0, 3, temp);
-		String flip = "Flip=initiated:" + String(temp)+"!";
+		String flip = "Flip=initiated:Speed=" + ftos(force)+"!";
 		gesture+=flip;
 	}
 	
 	if(rotationAxis[2]&&!isRolling)
 	{
 		float force = transfer.transferRolling(abs(rawData.gyro[2] - nominalRotation));
-		char temp[10];
-		dtostrf(force, 0, 3, temp);
-		String roll = "Roll=initiated:" + String(temp)+"!";
+		String roll = "Roll=initiated:Speed=" + ftos(force)+"!";
 		gesture+=roll;
 		isRolling = true;
 	}
 	else if(!rotationAxis[2]&&isRolling)
 	{
 		isRolling = false;
-		gesture+= "Roll=ended:0.00!";
+		gesture+= "Roll=ended!";
 	}
 	else if(isRolling)
 	{
 		float force = transfer.transferRolling(abs(rawData.gyro[2] - nominalRotation));
-		char temp[10];
-		dtostrf(force, 0, 3, temp);
-		String roll = "Roll=initiated:" + String(temp)+"!";
+		String roll = "Roll=initiated:Speed=" + ftos(force)+"!";
 		gesture+=roll;
 	}
 
@@ -268,15 +223,15 @@ String GestureHandler::getFalling()
 	if(magnitude < 10.0&&!isFalling)
 	{
 		isFalling = true;
-		return "Falling=started:0.00!";
+		return "Falling=initiated!";
 	}
 	else if(isFalling&&magnitude >20.0){
 		isFalling = false;
-		return "Falling=ended:0.00!";
+		return "Falling=ended!";
 	}
 	if(isFalling)
 	{
-		return "Falling=started:0.00!";
+		return "Falling=initiated!";
 	}
 	return ("");
 }
@@ -284,185 +239,85 @@ String GestureHandler::getFalling()
 //------------------------------------------------------------------------------
 void GestureHandler::getTouchPadFeatures(float means[], float stds[], int modes[])
 {
-	//Create a huge array
-	float body[48];
-	for(int i=0; i<16; i++)
-	{
-		body[i] = oldTorso[i];
-	}
-	for(int i=0; i<16; i++)
-	{
-		body[i+16] = oldBottom[i];
-	}
-	for(int i=0; i<16; i++)
-	{
-		body[i+32] = oldStomach[i];
-	}
-
 	//Get the means
 	means[0] = ftfMean(oldTorso, 16);
-	means[1] = ftfMean(oldBottom,16);
-	means[2] = ftfMean(oldStomach, 16);
-	means[4] = ftfMean(body, 48);
+	means[1] = ftfMean(oldBottom,9);
+	means[2] = ftfMean(oldStomach, 14);
 	
 	//Get the stds
 	stds[0] = ftfStd(oldTorso, 16);
-	stds[1] = ftfStd(oldBottom,16);
-	stds[2] = ftfStd(oldStomach, 16);
-	stds[4] = ftfStd(body, 48);
+	stds[1] = ftfStd(oldBottom,9);
+	stds[2] = ftfStd(oldStomach, 14);
 	
 	//Get the modes
 	modes[0] = ftiMode(oldTorso, 16);
-	modes[1] = ftiMode(oldBottom,16);
-	modes[2] = ftiMode(oldStomach, 16);
-	modes[4] = ftiMode(body, 48);
+	modes[1] = ftiMode(oldBottom,9);
+	modes[2] = ftiMode(oldStomach, 14);
 	
-	// Serial.print(means[2]);
-	// Serial.print('\t');
-	//Serial.print("\t|\t");
-	// Serial.print(stds[2]);
-	// Serial.print('\t');
-	//Serial.print("\t|\t");
-	// Serial.print(modes[2]);
+	//Get the sums
+	sums[0] = intSum(oldTorso, 16);
+	sums[1] = intSum(oldBottom, 9);
+	sums[2] = intSum(oldStomach, 14);
 }
 
-String GestureHandler::getHug()
+String GestureHandler::getUpsideDown()
 {
-	bool isModeEnough = modes[3] > hugModeThresholdHigh;
-	bool isStdEnough = stds[3] > hugStdThresholdHigh;
-	if(isModeEnough&&isStdEnough&&!isHugging&&hugCount==3)
-	{
-		isHugging = true;
-		float std = stds[3] > strongestHugStd ? stds[3] : strongestHugStd;
-		float mode = modes[3] > strongestHugMode ? modes[3] : strongestHugMode;
-		float force = transfer.transferHugging(std, mode);
-		char temp[10];
-		dtostrf(force, 0, 3, temp);
-		return "Hug=initiated:" + String(temp)+"!";
-	}
-	if(isModeEnough&&isStdEnough)
-	{
-		hugCount++;
-		hugCount = hugCount>3 ? 3 : hugCount;
-		strongestHugStd = stds[3] > strongestHugStd ? stds[3] : strongestHugStd;
-		strongestHugMode = modes[3] > strongestHugMode ? modes[3] : strongestHugMode;
-	}
-	if(isHugging && hugCount==0)
-	{
-		isHugging = false;
-		strongestHugStd = 0.0;
-		strongestHugMode = 0;
-		return "Hug=ended:0.00!";
-	}
-	isModeEnough = modes[3] > hugModeThresholdLow;
-	isStdEnough = stds[3] > hugStdThresholdLow;
-	if((!isModeEnough || !isStdEnough) && hugCount>0)
-	{
-		hugCount--;
-	}
-	if(isHugging)
-	{
-		float std = stds[3] > strongestHugStd ? stds[3] : strongestHugStd;
-		float mode = modes[3] > strongestHugMode ? modes[3] : strongestHugMode;
-		float force = transfer.transferHugging(std, mode);
-		char temp[10];
-		dtostrf(force, 0, 3, temp);
-		return "Hug=initiated:" + String(temp)+"!";
-	}
-	return ("");
+	return "";
 }
 
-//------------------------------------------------------------------------------
-//For petting we will not send intermediate information because it is somewhere
-//between a continuous gesture and an event based one, each pet may well be treated
-//as an event but it is still important to know when each starts and stops.
-String GestureHandler::getPet()
+String GestureHandler::getTouching()
 {
-	float movement[3];
+	String gesture = "";
 	for(int i=0; i<3; i++)
 	{
-		movement[i] = fabs(means[i] - lastMeans[i]);
-		if(movement[i]<petThresholdHigh)
+		float x  = sqrt(pow(rawData.accel[0]-accelerometerNominal,2) + 
+			pow(rawData.accel[1]-accelerometerNominal,2) + 
+			pow(rawData.accel[2]-accelerometerNominal,2));
+		int axis = ftiMode(rawData.accel, 3);
+		bool touchTest = sums[i] > 50;
+		if(touchTest&&!isTouching[i]&&touchCount[i]==3)
 		{
-			if(movement[i]>0.01)
+			isTouching[i] = true;
+
+		}
+		else if(touchTest && touchCount[i] < 3)
+		{
+			touchCount[i]++;
+		}
+		if(isTouching[i] && touchCount[i]==0)
+		{
+			isTouching[i] = 0;
+			gesture+= "Touch-"+String(i)+"=ended!";
+		}
+		else if(isTouching[i])
+		{
+			bool didShake = testShake(rawData.accel, shakingUpper);
+			float force;
+			switch (i)
 			{
-				filtered[i] = filtered[i] * 0.4 + 1;
+				case 0:
+					 force = transfer.transferTouching(rawData.torso[modes[i]]);
+					break;
+				case 1:
+					 force = transfer.transferTouching(rawData.bottom[modes[i]]);
+					break;
+				case 2:
+					 force = transfer.transferTouching(rawData.stomach[modes[i]]);
+					break;
+				default:
+					 force = 0.00;
 			}
-			else
-			{
-				filtered[i] = filtered[i] * 0.4;
-			}
-			if(filtered[i] >= petThresholdLow && !isPetting && petCount[i]>15)
-			{
-				isPetting = true;
-				petCount[(i+1)%3] = -1;
-				petCount[(i+2)%3] = -1;
-				// Serial.println("TTTTTTTTTTTTTTTTTTTT!");
-				int mode = modes[i] > strongestPetMode[i] ? modes[i] : strongestPetMode[i];
-				float speed = movement[i] > fastestPetSpeed[i] ? movement[i] : fastestPetSpeed[i];
-				return getPetGesture(i, mode, speed);
-			}
-			if(filtered[i]>=petThresholdLow && petCount[i]>=0)
-			{
-				petCount[i]++;
-				petCount[i] = petCount[i] > 20 ? 20 : petCount[i];
-				strongestPetMode[i] = modes[i] > strongestPetMode[i] ? modes[i] : strongestPetMode[i];
-				fastestPetSpeed[i] = movement[i] > fastestPetSpeed[i] ? movement[i] : fastestPetSpeed[i];
-			}
-			if(isPetting && petCount[i] < 10 && petCount[i] >=0)
-			{
-				isPetting = false;
-				strongestPetMode[i] = 0;
-				fastestPetSpeed[i] = 0.0;
-				petCount[(i+1)%3] = 0;
-				petCount[(i+2)%3] = 0;
-				//Serial.println("MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM!");
-				return "Pet=ended:0.00!";
-			}
-			if(filtered[i] < petThresholdLow && petCount[i] >0)
-			{
-				petCount[i]--;
-			}
-			
+			float area = transfer.transferTouchArea(stds[i]);
+			gesture+= "Touch-"+String(i)+"=initiated:Pressure=" + ftos(force) + 
+				":Area=" + ftos(area)+":Position=" + ftos(means[i])+
+				":Acceleration=" + String(didShake)+"!";
+		}
+		if(!touchTest && touchCount[i] > 0)
+		{
+			touchCount[i]--;
 		}
 	}
-	//Serial.print('\t');
-		//Serial.println(means[2] - lastMeans[2]);
-		
-		 //Serial.print(means[2]);
-		 //Serial.print('\t');
-		 //Serial.print(stds[2]);
-		 //Serial.print('\t');
-		 //Serial.print(modes[2]);
-		 //Serial.print('\t');
-	//Serial.println(filtered[2]); 
-	return "";
-}
-
-String GestureHandler::getPetGesture(int position, int mode, float speed)
-{
-	float force = transfer.transferPetting(position, mode, speed);
-	char temp[10];
-	dtostrf(force, 0, 3, temp);
-	switch(position)
-	{
-		case 0:
-			return "Pet-torso=initiated:" + String(temp)+"!";
-		case 1:
-			return "Pet-bottom=initiated:" + String(temp)+"!";
-		case 2:
-			return "Pet-stomach=initiated:" + String(temp)+"!";
-		default:
-			return "";
-	}
-	
-}
-
-//------------------------------------------------------------------------------
-//Unimplemented for now
-String GestureHandler::getScratch()
-{
-	return "";
+	return gesture;
 }
 
 //------------------------------------------------------------------------------
@@ -478,9 +333,7 @@ String GestureHandler::getHandHold()
 			isHolding[i] = true;
 			float touchStrength = rawData.legs[i] > maxTouch[i] ? rawData.legs[i] : maxTouch[i];
 			float force = transfer.transferHold(touchStrength);
-			char temp[10];
-			dtostrf(force, 0, 3, temp);
-			gesture+="Touch-"+String(i)+"=initiated:"+String(temp)+"!";
+			gesture+="Touch-"+String(i)+"=initiated:Pressure="+ftos(force)+"!";
 		}
 		if(touch[i])
 		{
@@ -492,7 +345,7 @@ String GestureHandler::getHandHold()
 		{
 			isHolding[i] = false;
 			maxTouch[i] = 0;
-			gesture+= "Touch-"+String(i)+"=ended:0.00!";
+			gesture+= "Touch-"+String(i)+"=ended!";
 		}
 		if(!touch[i] && holdCount[i]>0)
 		{
@@ -502,55 +355,10 @@ String GestureHandler::getHandHold()
 		{
 			float touchStrength = rawData.legs[i] > maxTouch[i] ? rawData.legs[i] : maxTouch[i];
 			float force = transfer.transferHold(touchStrength);
-			char temp[10];
-			dtostrf(force, 0, 3, temp);
-			gesture+="Touch-"+String(i)+"=initiated:"+String(temp)+"!";
+			gesture+="Touch-"+String(i)+"=initiated:Pressure="+ftos(force)+"!";
 		}
 	}
 	return gesture;
-}
-
-//------------------------------------------------------------------------------
-//Unimplemented for now
-String GestureHandler::getFeed()
-{
-	return "";
-}
- 
-//------------------------------------------------------------------------------
-String GestureHandler::getPoke()
-{
-	for(int i=0; i<3; i++)
-	{
-		float stdChange = fabs(stds[i] - lastStds[i]);
-		float modeChange = fabs(modes[i] - lastModes[i]);
-		if(stdChange < pokeStdThreshold && modeChange > pokeModeThreshold && !isHugging)
-		{
-			float force = transfer.transferPoke(modes[i], stds[i]);
-			char temp[10];
-			dtostrf(force, 0, 3, temp);
-			return "Poke=detected:"+String(temp)+"!";
-		}
-	}
-	return "";
-}
-
-//------------------------------------------------------------------------------
-String GestureHandler::getSlap()
-{
-	for(int i=0; i<4; i++)
-	{
-		float stdChange = fabs(stds[i] - lastStds[i]);
-		float modeChange = fabs(modes[i] - lastModes[i]);
-		if(stdChange > slapStdThreshold && modeChange > slapModeThreshold && !isHugging)
-		{
-			float force = transfer.transferSlap(modes[i], stds[i]);
-			char temp[10];
-			dtostrf(force, 0, 3, temp);
-			return "Slap=Detected:"+String(temp)+"!";
-		}
-	}
-	return "";
 }
 
 //------------------------------------------------------------------------------
@@ -558,10 +366,7 @@ String GestureHandler::getKiss()
 {
 	if(rawData.mouth>kissThreshold)
 	{
-		float force = transfer.transferKiss(rawData.mouth);
-		char temp[10];
-		dtostrf(force, 0, 3, temp);
-		return "Kiss=Detected:"+String(temp)+"!";
+		return "Kiss=Detected!";
 	}
 	return "";
 }
@@ -571,8 +376,4 @@ void GestureHandler::update()
 {
 	//Copy over the rest of the data
 	copyInt(pastAccel, rawData.accel, 3);
-	copyFloat(lastMeans, means, 4);
-	copyFloat(lastStds, stds, 4);
-	copyInt(lastModes, modes, 4);
-	
 }
