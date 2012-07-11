@@ -28,8 +28,8 @@ typedef struct {
 	int accel[3];
 	int gyro[3];
 	int torso[16];
-	int stomach[16];
-	int bottom[16];
+	int stomach[14];
+	int bottom[9];
 	int legs[4];
 	int mouth;
 } sensorData;
@@ -54,13 +54,16 @@ typedef struct {
 	float floatSum(float data[], int length);
 	
 //The float valued float mean method
-	float ftfMean(float data[], int length);
+	float ftfMean(int data[], int length);
 	
 //The float values float std method
-	float ftfStd(float data[], int length);
+	float ftfStd(int data[], int length);
 
 //The float to int mode method
-	int ftiMode(float data[], int length);
+	int ftiMode(int data[], int length);
+	
+//The float to string method
+	String ftos(float input);
 #endif
 
 

@@ -30,7 +30,7 @@ SensorHandler::SensorHandler(int Apins[], int Gpins[], int FpinT, int FpinS, int
 		copyInt(legPins, TLpins, 4);
 		mouthPin = TpinM;
 		
-		deadPixThreshold = 400;
+		deadPixThreshold = 200;
 		
 		for(int i = 0; i<4; i++)
 		{
@@ -67,7 +67,7 @@ void SensorHandler::getTorsoData(int data[])
 	for(int i=0; i<16; i++)
 	{
 		torsoMultiplexer(i);
-		int temp = analogRead(torsoPin)-300;
+		int temp = analogRead(torsoPin)-250;
 		data[i] = temp > 0 ? temp : 0;
 	}
 	for(int i=0; i<16; i++)
@@ -79,15 +79,13 @@ void SensorHandler::getTorsoData(int data[])
 void SensorHandler::getStomachData(int data[])
 {
 
-	for(int i=0; i<16; i++)
+	for(int i=1; i<15; i++)
 	{
 		stomachMultiplexer(i);
-		
-		int temp = analogRead(stomachPin);//-260;
-		data[i] = temp > 0 ? temp : 0;
-		
+		int temp = analogRead(stomachPin)-250;
+		data[i-1] = temp > 0 ? temp : 0;		
 	}
-	for(int i=0; i<16; i++)
+	for(int i=0; i<14; i++)
 	{
 		//data[i] = removeDeadPixels(data, i, 16);
 	}
@@ -96,30 +94,31 @@ void SensorHandler::getStomachData(int data[])
 
 void SensorHandler::getBottomData(int data[])
 {
-	for(int i=0; i<8; i++)
+	for(int i=4; i<13; i++)
 	{
 		bottomMultiplexer(i);
-		int temp = analogRead(bottomPin)-300;
-		data[i] = temp > 0 ? temp : 0;
+		int temp = analogRead(bottomPin)-250;
+		data[i-1] = temp > 0 ? temp : 0;
 	}
-	for(int i=8; i<16; i++)
+	for(int i=0; i<9; i++)
 	{
-		data[i] = 0;
+		data[i] = removeDeadPixels(data, i, 16);
 	}
 }
 
 int SensorHandler::removeDeadPixels(int data[], int index, int size)
 {
-	int head = index < size-1 ? index+1 : index-2;
-	int tail = index > 0 ? index-1 : index+2;
-	if(head == index)
-	{
-		head = tail;
-	}
-	if(data[index] > deadPixThreshold)
-	{
-		return (data[head]+data[tail]) /2;
-	}
+	// int head = index < size-1 ? index+1 : index-2;
+	// int tail = index > 0 ? index-1 : index+2;
+	// if(head == index)
+	// {
+		// head = tail;
+	// }
+	// if(data[index] > deadPixThreshold)
+	// {
+		// return (data[head]+data[tail]) /2;
+	// }
+	if(data[index] > deadPixThreshold) return 0;
 	else return data[index];
 }
 
