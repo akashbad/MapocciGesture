@@ -43,10 +43,10 @@ String Gesture::process(GestureHandler *pHandler, sensorData data)
 	results+= handler.getShaking();
 	results+= handler.getRotating();
 	results+= handler.getFalling();
-	results+= handler.getUpsideDown();
-	results+= handler.getTouching();
-	results+= handler.getHandHold();
-	results+= handler.getKiss();
+	//results+= handler.getUpsideDown();
+	//results+= handler.getTouching();
+	//results+= handler.getHandHold();
+	//results+= handler.getKiss();
 	handler.update();
 	*pHandler = handler;
 	return (results);
