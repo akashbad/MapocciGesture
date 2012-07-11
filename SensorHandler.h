@@ -52,9 +52,9 @@ class SensorHandler
 		void torsoMultiplexer(int node);
 		void stomachMultiplexer(int node);
 		void bottomMultiplexer(int node);
-		
 		int removeDeadPixels(int data[], int index, int size);
 		int deadPixThreshold;
+		
 		
 		int accelPins[3];
 		int gyroPins[3];

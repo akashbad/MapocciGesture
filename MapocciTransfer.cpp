@@ -44,30 +44,19 @@ float MapocciTransfer::transferSpinning(float velocity)
 	return map(velocity, 50.0, 512, minForce, maxForce);
 }
 
-float MapocciTransfer::transferHugging(float std, int mode)
+float MapocciTransfer::transferTouching(float pressure)
 {
 	return 0.0;
 }
-
-float MapocciTransfer::transferPetting(float std, int mode, float speed)
+float MapocciTransfer::transferTouchArea(float std)
 {
 	return 0.0;
 }
-
 float MapocciTransfer::transferHold(int touch)
 {
 	return 0.0;
 }
 
-float MapocciTransfer::transferPoke(int mode, float std)
-{
-	return 0.0;
-}
-
-float MapocciTransfer::transferSlap(int mode, float std)
-{
-	return 0.0;
-}
 
 float MapocciTransfer::transferKiss(int mouth)
 {

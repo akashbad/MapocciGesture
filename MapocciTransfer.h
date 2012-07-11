@@ -37,11 +37,9 @@ class MapocciTransfer
 		float transferFlipping(float velocity);
 		float transferRolling(float velocity);
 		float transferSpinning(float velocity);
-		float transferHugging(float std, int mode);
-		float transferPetting(float std, int mode, float speed);
+		float transferTouching(float pressure);
+		float transferTouchArea(float std);
 		float transferHold(int touch);
-		float transferPoke(int mode, float std);
-		float transferSlap(int mode, float std);
 		float transferKiss(int mouth);
 		
 	private:
