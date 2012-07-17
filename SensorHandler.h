@@ -55,7 +55,7 @@ class SensorHandler
 		int removeDeadPixels(int data[], int index, int size);
 		int deadPixThreshold;
 		
-		
+		int readCapacitivePin(int pinToMeasure);
 		int accelPins[3];
 		int gyroPins[3];
 		int torsoPin;

@@ -67,12 +67,12 @@ void SensorHandler::getTorsoData(int data[])
 	for(int i=0; i<16; i++)
 	{
 		torsoMultiplexer(i);
-		int temp = analogRead(torsoPin)-250;
+		int temp = analogRead(torsoPin);//-250;
 		data[i] = temp > 0 ? temp : 0;
 	}
 	for(int i=0; i<16; i++)
 	{
-		data[i] = removeDeadPixels(data, i, 16);
+		//data[i] = removeDeadPixels(data, i, 16);
 	}
 }
 
@@ -82,7 +82,7 @@ void SensorHandler::getStomachData(int data[])
 	for(int i=1; i<15; i++)
 	{
 		stomachMultiplexer(i);
-		int temp = analogRead(stomachPin)-250;
+		int temp = analogRead(stomachPin);//-250;
 		data[i-1] = temp > 0 ? temp : 0;		
 	}
 	for(int i=0; i<14; i++)
@@ -97,12 +97,12 @@ void SensorHandler::getBottomData(int data[])
 	for(int i=4; i<13; i++)
 	{
 		bottomMultiplexer(i);
-		int temp = analogRead(bottomPin)-250;
-		data[i-1] = temp > 0 ? temp : 0;
+		int temp = analogRead(bottomPin);//-250;
+		data[i-4] = temp > 0 ? temp : 0;
 	}
 	for(int i=0; i<9; i++)
 	{
-		data[i] = removeDeadPixels(data, i, 16);
+		//data[i] = removeDeadPixels(data, i, 16);
 	}
 }
 
@@ -132,7 +132,63 @@ void SensorHandler::getLegsData(int data[])
 
 int SensorHandler::getMouthData()
 {
-	return (analogRead(mouthPin));
+	return (readCapacitivePin(mouthPin));
+}
+
+int SensorHandler::readCapacitivePin(int pinToMeasure)
+{
+  // This is how you declare a variable which
+  //  will hold the PORT, PIN, and DDR registers
+  //  on an AVR
+  volatile uint8_t* port;
+  volatile uint8_t* ddr;
+  volatile uint8_t* pin;
+  // Here we translate the input pin number from
+  //  Arduino pin number to the AVR PORT, PIN, DDR,
+  //  and which bit of those registers we care about.
+  byte bitmask;
+  if ((pinToMeasure >= 0) && (pinToMeasure <= 7)){
+    port = &PORTD;
+    ddr = &DDRD;
+    bitmask = 1 << pinToMeasure;
+    pin = &PIND;
+  }
+  if ((pinToMeasure > 7) && (pinToMeasure <= 13)){
+    port = &PORTB;
+    ddr = &DDRB;
+    bitmask = 1 << (pinToMeasure - 8);
+    pin = &PINB;
+  }
+  if ((pinToMeasure > 13) && (pinToMeasure <= 19)){
+    port = &PORTC;
+    ddr = &DDRC;
+    bitmask = 1 << (pinToMeasure - 13);
+    pin = &PINC;
+  }
+  // Discharge the pin first by setting it low and output
+  *port &= ~(bitmask);
+  *ddr  |= bitmask;
+  delay(1);
+  // Make the pin an input WITHOUT the internal pull-up on
+  *ddr &= ~(bitmask);
+  // Now see how long the pin to get pulled up
+  int cycles = 16000;
+  for(int i = 0; i < cycles; i++){
+    if (*pin & bitmask){
+      cycles = i;
+      break;
+    }
+  }
+  // Discharge the pin again by setting it low and output
+  //  It's important to leave the pins low if you want to 
+  //  be able to touch more than 1 sensor at a time - if
+  //  the sensor is left pulled high, when you touch
+  //  two sensors, your body will transfer the charge between
+  //  sensors.0
+  *port &= ~(bitmask);
+  *ddr  |= bitmask;
+  
+  return cycles;
 }
 
 void SensorHandler::torsoMultiplexer(int node)
