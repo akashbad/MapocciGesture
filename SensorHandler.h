@@ -14,6 +14,9 @@ CHANGE LOG
 #define SensorHandler_H_
 #include "Arduino.h"
 #include "General.h"
+#include "wiring_private.h"
+#include "pins_arduino.h"
+
 
 //End of the includes
 
@@ -22,6 +25,7 @@ extern "C" {
 #endif
 void loop();
 void setup();
+int readCapacitivePin(int pinToMeasure);
 
 #ifdef __cplusplus
 } //extern "C"
@@ -35,7 +39,7 @@ class SensorHandler
 	//public method for each of the sensors and private methods to allow for proper handling
 	public:
 		SensorHandler(int Apins[], int Gpins[], int FpinT, int FpinS, int FpinB, 
-					int ConTpins[], int ConSpins[], int ConBpins[], int TLpins[], int TpinM);
+					int ConTpins[], int ConSpins[], int ConBpins[], int tPin, int mPin);
 					
 					
 		void getAccelData(int data[]);
@@ -43,7 +47,7 @@ class SensorHandler
 		void getTorsoData(int data[]);
 		void getStomachData(int data[]);
 		void getBottomData(int data[]);
-		void getLegsData(int data[]);
+		int getTailData();
 		int getMouthData();
 		
 	//Methods to multiplex the sensors that share an adc pin and variables to hold pin numbers
@@ -55,7 +59,8 @@ class SensorHandler
 		int removeDeadPixels(int data[], int index, int size);
 		int deadPixThreshold;
 		
-		int readCapacitivePin(int pinToMeasure);
+
+
 		int accelPins[3];
 		int gyroPins[3];
 		int torsoPin;
@@ -64,7 +69,7 @@ class SensorHandler
 		int torsoControl[4];
 		int stomachControl[4];
 		int bottomControl[4];
-		int legPins[4];
+		int tailPin;
 		int mouthPin;
 };
 

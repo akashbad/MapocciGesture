@@ -46,14 +46,8 @@ GestureHandler::GestureHandler(MapocciTransfer model)
 	//Upside down variable initialization
 	isUpsideDown = false;
 	
-	//Hand hold variable initialization
-	legsThreshold;
-	for(int i=0; i<4; i++)
-	{
-		isHolding[i] = false;
-		maxTouch[i] = 0;
-		holdCount[i] = 0;
-	}
+	//Tail variable initialization
+	tailThreshold;
 	
 	
 	//Kiss variable initialization
@@ -78,7 +72,7 @@ void GestureHandler::report(sensorData data)
 	{
 		oldTorso[i] = rawData.torso[i] > 20 ? rawData.torso[i] : 0;
 	}
-	
+	/*
 	for(int i=0; i<16; i++)
 	{
 		Serial.print(oldTorso[i]);
@@ -97,7 +91,8 @@ void GestureHandler::report(sensorData data)
 		Serial.print('\t');
 	}
 	//Serial.print('|');
-	Serial.println("");
+	Serial.println("");*/
+	Serial.println(rawData.tail);
 	
 	getTouchPadFeatures(means, stds, modes);
 }
@@ -351,44 +346,13 @@ String GestureHandler::getTouching()
 }
 
 //------------------------------------------------------------------------------
-String GestureHandler::getHandHold()
+String GestureHandler::getTailTouch()
 {
-	String gesture = "";
-	bool touch[4];
-	for(int i=0; i<4; i++)
+	if(rawData.tail>tailThreshold)
 	{
-		touch[i] = rawData.legs[i] > legsThreshold;
-		if(touch[i] && !isHolding[i] && holdCount[i]==4)
-		{
-			isHolding[i] = true;
-			float touchStrength = rawData.legs[i] > maxTouch[i] ? rawData.legs[i] : maxTouch[i];
-			float force = transfer.transferHold(touchStrength);
-			gesture+="Touch-"+String(i)+"=initiated:Pressure="+ftos(force)+"!";
-		}
-		if(touch[i])
-		{
-			holdCount[i]++;
-			holdCount[i] = holdCount[i]>4 ? 4 : holdCount[i];
-			maxTouch[i] = rawData.legs[i] > maxTouch[i] ? rawData.legs[i] : maxTouch[i];
-		}
-		if(isHolding[i] && holdCount==0)
-		{
-			isHolding[i] = false;
-			maxTouch[i] = 0;
-			gesture+= "Touch-"+String(i)+"=ended!";
-		}
-		if(!touch[i] && holdCount[i]>0)
-		{
-			holdCount[i]--;
-		}
-		if(isHolding[i])
-		{
-			float touchStrength = rawData.legs[i] > maxTouch[i] ? rawData.legs[i] : maxTouch[i];
-			float force = transfer.transferHold(touchStrength);
-			gesture+="Touch-"+String(i)+"=initiated:Pressure="+ftos(force)+"!";
-		}
+		return "Tail=Detected!";
 	}
-	return gesture;
+	return "";
 }
 
 //------------------------------------------------------------------------------

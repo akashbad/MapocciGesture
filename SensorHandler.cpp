@@ -11,11 +11,13 @@ CHANGE LOG
 #include "Arduino.h"
 #include "General.h"
 #include "SensorHandler.h"
+#include "wiring_private.h"
+#include "pins_arduino.h"
 
 
 
 SensorHandler::SensorHandler(int Apins[], int Gpins[], int FpinT, int FpinS, int FpinB, 
-					int ConTpins[], int ConSpins[], int ConBpins[], int TLpins[], int TpinM)
+					int ConTpins[], int ConSpins[], int ConBpins[], int tPin, int mPin)
 {
 		//Assign all of the pins to their correct variables so that handler can read from the
 		//correct place
@@ -27,8 +29,8 @@ SensorHandler::SensorHandler(int Apins[], int Gpins[], int FpinT, int FpinS, int
 		copyInt(torsoControl, ConTpins, 4);
 		copyInt(stomachControl, ConSpins, 4);
 		copyInt(bottomControl, ConBpins, 4);
-		copyInt(legPins, TLpins, 4);
-		mouthPin = TpinM;
+		tailPin = tPin;
+		mouthPin = mPin;
 		
 		deadPixThreshold = 200;
 		
@@ -122,12 +124,9 @@ int SensorHandler::removeDeadPixels(int data[], int index, int size)
 	else return data[index];
 }
 
-void SensorHandler::getLegsData(int data[])
+int SensorHandler::getTailData()
 {
-	for(int i=0; i<4; i++)
-	{
-		data[i] = analogRead(legPins[i]);
-	}
+	return(readCapacitivePin(tailPin));
 }
 
 int SensorHandler::getMouthData()
@@ -135,42 +134,40 @@ int SensorHandler::getMouthData()
 	return (readCapacitivePin(mouthPin));
 }
 
-int SensorHandler::readCapacitivePin(int pinToMeasure)
-{
+// readCapacitivePin
+//  Input: Arduino pin number
+//  Output: A number, from 0 to 17 expressing
+//          how much capacitance is on the pin
+//  When you touch the pin, or whatever you have
+//  attached to it, the number will get higher
+//  In order for this to work now,
+// The pin should have a 1+Megaohm resistor pulling
+//  it up to +5v.
+int readCapacitivePin(int pinToMeasure){
   // This is how you declare a variable which
   //  will hold the PORT, PIN, and DDR registers
   //  on an AVR
-  volatile uint8_t* port;
-  volatile uint8_t* ddr;
-  volatile uint8_t* pin;
+
   // Here we translate the input pin number from
   //  Arduino pin number to the AVR PORT, PIN, DDR,
   //  and which bit of those registers we care about.
-  byte bitmask;
-  if ((pinToMeasure >= 0) && (pinToMeasure <= 7)){
-    port = &PORTD;
-    ddr = &DDRD;
-    bitmask = 1 << pinToMeasure;
-    pin = &PIND;
-  }
-  if ((pinToMeasure > 7) && (pinToMeasure <= 13)){
-    port = &PORTB;
-    ddr = &DDRB;
-    bitmask = 1 << (pinToMeasure - 8);
-    pin = &PINB;
-  }
-  if ((pinToMeasure > 13) && (pinToMeasure <= 19)){
-    port = &PORTC;
-    ddr = &DDRC;
-    bitmask = 1 << (pinToMeasure - 13);
-    pin = &PINC;
-  }
+  uint8_t bitmask = digitalPinToBitMask(pinToMeasure);
+  uint8_t port = digitalPinToPort(pinToMeasure);
+
+  volatile uint8_t* out;
+  volatile uint8_t* pin;
+  volatile uint8_t* reg;
+
+  out = portOutputRegister(port);
+  reg = portModeRegister(port);
+  pin = portInputRegister(port);
+
   // Discharge the pin first by setting it low and output
-  *port &= ~(bitmask);
-  *ddr  |= bitmask;
+  *out &= ~(bitmask);
+  *reg  |= bitmask;
   delay(1);
   // Make the pin an input WITHOUT the internal pull-up on
-  *ddr &= ~(bitmask);
+  *reg &= ~(bitmask);
   // Now see how long the pin to get pulled up
   int cycles = 16000;
   for(int i = 0; i < cycles; i++){
@@ -184,9 +181,9 @@ int SensorHandler::readCapacitivePin(int pinToMeasure)
   //  be able to touch more than 1 sensor at a time - if
   //  the sensor is left pulled high, when you touch
   //  two sensors, your body will transfer the charge between
-  //  sensors.0
-  *port &= ~(bitmask);
-  *ddr  |= bitmask;
+  //  sensors.
+  *out &= ~(bitmask);
+  *reg  |= bitmask;
   
   return cycles;
 }

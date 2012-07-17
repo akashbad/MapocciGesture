@@ -42,7 +42,7 @@ class GestureHandler
 		String getFalling();
 		String getUpsideDown();
 		String getTouching();
-		String getHandHold();
+		String getTailTouch();
 		String getKiss();
 		
 		void update();
@@ -100,11 +100,8 @@ class GestureHandler
 		bool isTouching[3];
 		
 		
-		//Hand hold helper variables
-		float legsThreshold;
-		bool isHolding[4];
-		int maxTouch[4];
-		int holdCount[4];
+		//Tail detection helper variables
+		int tailThreshold;
 		
 		//Poke detection helper variables
 		float pokeStdThreshold;

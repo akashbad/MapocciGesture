@@ -52,7 +52,7 @@ float MapocciTransfer::transferTouchArea(float std)
 {
 	return 0.0;
 }
-float MapocciTransfer::transferHold(int touch)
+float MapocciTransfer::transferTail(int touch)
 {
 	return 0.0;
 }

@@ -28,7 +28,7 @@ sensorData Gesture::collect(SensorHandler handler)
 	handler.getTorsoData(data.torso);
 	handler.getStomachData(data.stomach);
 	handler.getBottomData(data.bottom);
-	handler.getLegsData(data.legs);
+	data.tail = handler.getTailData();
 	data.mouth = handler.getMouthData();
 	return (data);
 }
@@ -45,7 +45,7 @@ String Gesture::process(GestureHandler *pHandler, sensorData data)
 	results+= handler.getFalling();
 	//results+= handler.getUpsideDown();
 	//results+= handler.getTouching();
-	//results+= handler.getHandHold();
+	//results+= handler.getTailTouch();
 	//results+= handler.getKiss();
 	handler.update();
 	*pHandler = handler;

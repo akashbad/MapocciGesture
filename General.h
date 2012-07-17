@@ -30,7 +30,7 @@ typedef struct {
 	int torso[16];
 	int stomach[14];
 	int bottom[9];
-	int legs[4];
+	int tail;
 	int mouth;
 } sensorData;
 

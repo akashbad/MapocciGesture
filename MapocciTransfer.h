@@ -39,7 +39,7 @@ class MapocciTransfer
 		float transferSpinning(float velocity);
 		float transferTouching(float pressure);
 		float transferTouchArea(float std);
-		float transferHold(int touch);
+		float transferTail(int touch);
 		float transferKiss(int mouth);
 		
 	private:
