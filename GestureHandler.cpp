@@ -72,7 +72,7 @@ void GestureHandler::report(sensorData data)
 	{
 		oldTorso[i] = rawData.torso[i] > 20 ? rawData.torso[i] : 0;
 	}
-	/*
+	
 	for(int i=0; i<16; i++)
 	{
 		Serial.print(oldTorso[i]);
@@ -90,9 +90,9 @@ void GestureHandler::report(sensorData data)
 		Serial.print(oldStomach[i]);
 		Serial.print('\t');
 	}
-	//Serial.print('|');
-	Serial.println("");*/
-	Serial.println(rawData.tail);
+	Serial.print('|');
+	Serial.println("");
+//	Serial.println(rawData.tail);
 	
 	getTouchPadFeatures(means, stds, modes);
 }
