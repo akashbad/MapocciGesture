@@ -51,7 +51,7 @@ GestureHandler::GestureHandler(MapocciTransfer model)
 	
 	
 	//Kiss variable initialization
-	kissThreshold;
+	kissThreshold = 20;
 }
 
 void GestureHandler::report(sensorData data)
@@ -92,7 +92,7 @@ void GestureHandler::report(sensorData data)
 	}
 	Serial.print('|');
 	Serial.println("");
-//	Serial.println(rawData.tail);
+	//Serial.println(rawData.mouth);
 	
 	getTouchPadFeatures(means, stds, modes);
 }
