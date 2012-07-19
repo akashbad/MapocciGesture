@@ -98,6 +98,9 @@ class GestureHandler
 		//Touch detection variables
 		int touchCount[3];
 		bool isTouching[3];
+		bool fuckyou;
+		int shit;
+		int testInt;
 		
 		
 		//Tail detection helper variables

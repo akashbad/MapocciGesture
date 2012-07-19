@@ -46,9 +46,18 @@ GestureHandler::GestureHandler(MapocciTransfer model)
 	//Upside down variable initialization
 	isUpsideDown = false;
 	
+	//Touch variable initialization
+	touchCount[0] = 0;
+	touchCount[1] = 0;
+	touchCount[2] = 0;
+	isTouching[0] = false;
+	isTouching[1] = false;
+	isTouching[2] = false;
+
 	//Tail variable initialization
 	tailThreshold;
 	
+	Serial.println("fuck your mother");
 	
 	//Kiss variable initialization
 	kissThreshold = 20;
@@ -73,25 +82,25 @@ void GestureHandler::report(sensorData data)
 		oldTorso[i] = rawData.torso[i] > 20 ? rawData.torso[i] : 0;
 	}
 	
-	for(int i=0; i<16; i++)
-	{
-		Serial.print(oldTorso[i]);
-		Serial.print('\t');
-	}
-	//Serial.print('|');
-	for(int i=0; i<9; i++)
-	{
-		Serial.print(oldBottom[i]);
-		Serial.print('\t');
-	}
-	//Serial.print('|');
-		for(int i=0; i<14; i++)
-	{
-		Serial.print(oldStomach[i]);
-		Serial.print('\t');
-	}
-	Serial.print('|');
-	Serial.println("");
+//	for(int i=0; i<16; i++)
+//	{
+//		Serial.print(oldTorso[i]);
+//		Serial.print('\t');
+//	}
+//	//Serial.print('|');
+//	for(int i=0; i<9; i++)
+//	{
+//		Serial.print(oldBottom[i]);
+//		Serial.print('\t');
+//	}
+//	//Serial.print('|');
+//		for(int i=0; i<14; i++)
+//	{
+//		Serial.print(oldStomach[i]);
+//		Serial.print('\t');
+//	}
+//	Serial.print('|');
+//	Serial.println("");
 	//Serial.println(rawData.mouth);
 	
 	getTouchPadFeatures(means, stds, modes);
@@ -295,6 +304,7 @@ String GestureHandler::getTouching()
 	String gesture = "";
 	for(int i=0; i<3; i++)
 	{
+	int i =0;
 		float x  = sqrt(pow(rawData.accel[0]-accelerometerNominal,2) + 
 			pow(rawData.accel[1]-accelerometerNominal,2) + 
 			pow(rawData.accel[2]-accelerometerNominal,2));
@@ -303,15 +313,15 @@ String GestureHandler::getTouching()
 		if(touchTest&&!isTouching[i]&&touchCount[i]==3)
 		{
 			isTouching[i] = true;
-
+			Serial.println("ACTIVE");
 		}
-		else if(touchTest && touchCount[i] < 3)
+		else if(touchTest)&&touchCount[i] < 3)
 		{
 			touchCount[i]++;
 		}
-		if(isTouching[i] && touchCount[i]==0)
+		if(isTouching[i]&&touchCount[i]==0)
 		{
-			isTouching[i] = 0;
+			isTouching[i] = false;
 			gesture+= "Touch-"+String(i)+"=ended!";
 		}
 		else if(isTouching[i])
