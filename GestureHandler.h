@@ -84,6 +84,8 @@ class GestureHandler
 		
 		//Helper function for the touchPads
 		void getTouchPadFeatures(float means[], float stds[], int modes[]);
+
+		String getTouchGestureString(int i);
 		
 		//Helper variables for each of the touchPads
 		float means[3];
@@ -98,9 +100,6 @@ class GestureHandler
 		//Touch detection variables
 		int touchCount[3];
 		bool isTouching[3];
-		bool fuckyou;
-		int shit;
-		int testInt;
 		
 		
 		//Tail detection helper variables
@@ -116,6 +115,9 @@ class GestureHandler
 		
 		//Kiss detection helper variables
 		int kissThreshold;
+
+		bool isTest;
+		int testCount;
 		
 };
 

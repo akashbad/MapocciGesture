@@ -46,21 +46,11 @@ float MapocciTransfer::transferSpinning(float velocity)
 
 float MapocciTransfer::transferTouching(float pressure)
 {
-	return 0.0;
+	return (float)pressure;
 }
 float MapocciTransfer::transferTouchArea(float std)
 {
-	return 0.0;
-}
-float MapocciTransfer::transferTail(int touch)
-{
-	return 0.0;
-}
-
-
-float MapocciTransfer::transferKiss(int mouth)
-{
-	return 0.0;
+	return (float)std;
 }
 
 	

@@ -32,6 +32,7 @@ typedef struct {
 	int bottom[9];
 	int tail;
 	int mouth;
+	int bodyTouches[3];
 } sensorData;
 
 //The int array copy method

@@ -39,7 +39,7 @@ class SensorHandler
 	//public method for each of the sensors and private methods to allow for proper handling
 	public:
 		SensorHandler(int Apins[], int Gpins[], int FpinT, int FpinS, int FpinB, 
-					int ConTpins[], int ConSpins[], int ConBpins[], int tPin, int mPin);
+					int ConTpins[], int ConSpins[], int ConBpins[], int tPin, int mPin, int btPins[]);
 					
 					
 		void getAccelData(int data[]);
@@ -49,6 +49,7 @@ class SensorHandler
 		void getBottomData(int data[]);
 		int getTailData();
 		int getMouthData();
+		void getBodyTouches(int data[]);
 		
 	//Methods to multiplex the sensors that share an adc pin and variables to hold pin numbers
 	private:
@@ -71,6 +72,7 @@ class SensorHandler
 		int bottomControl[4];
 		int tailPin;
 		int mouthPin;
+		int bodyTouchPins[3];
 };
 
 #endif

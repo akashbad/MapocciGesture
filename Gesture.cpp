@@ -30,6 +30,7 @@ sensorData Gesture::collect(SensorHandler handler)
 	handler.getBottomData(data.bottom);
 	data.tail = handler.getTailData();
 	data.mouth = handler.getMouthData();
+	handler.getBodyTouches(data.bodyTouches);
 	return (data);
 }
 
@@ -40,12 +41,12 @@ String Gesture::process(GestureHandler *pHandler, sensorData data)
 	//Some require the data from only one sensor, others for more
 	GestureHandler handler = *pHandler;
 	handler.report(data);
-	results+= handler.getShaking();
-	results+= handler.getRotating();
-	results+= handler.getFalling();
-	results+= handler.getUpsideDown();
+	// results+= handler.getShaking();
+	// results+= handler.getRotating();
+	// results+= handler.getFalling();
+	// results+= handler.getUpsideDown();
 	results+= handler.getTouching();
-	results+= handler.getTailTouch();
+	// results+= handler.getTailTouch();
 	results+= handler.getKiss();
 	handler.update();
 	*pHandler = handler;

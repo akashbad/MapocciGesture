@@ -17,7 +17,7 @@ CHANGE LOG
 
 
 SensorHandler::SensorHandler(int Apins[], int Gpins[], int FpinT, int FpinS, int FpinB, 
-					int ConTpins[], int ConSpins[], int ConBpins[], int tPin, int mPin)
+					int ConTpins[], int ConSpins[], int ConBpins[], int tPin, int mPin, int btPins[])
 {
 		//Assign all of the pins to their correct variables so that handler can read from the
 		//correct place
@@ -31,6 +31,7 @@ SensorHandler::SensorHandler(int Apins[], int Gpins[], int FpinT, int FpinS, int
 		copyInt(bottomControl, ConBpins, 4);
 		tailPin = tPin;
 		mouthPin = mPin;
+		copyInt(bodyTouchPins, btPins,3);
 		
 		deadPixThreshold = 250;
 		
@@ -69,7 +70,7 @@ void SensorHandler::getTorsoData(int data[])
 	for(int i=0; i<16; i++)
 	{
 		torsoMultiplexer(i);
-		int temp = analogRead(torsoPin);//-270;
+		int temp = analogRead(torsoPin)-270;
 		data[i] = temp > 0 ? temp : 0;
 	}
 	for(int i=0; i<16; i++)
@@ -99,7 +100,7 @@ void SensorHandler::getBottomData(int data[])
 	for(int i=4; i<13; i++)
 	{
 		bottomMultiplexer(i);
-		int temp = analogRead(bottomPin)-1024;//270;
+		int temp = analogRead(bottomPin)-270;
 		data[i-4] = temp > 0 ? temp : 0;
 	}
 	for(int i=0; i<9; i++)
@@ -126,12 +127,20 @@ int SensorHandler::removeDeadPixels(int data[], int index, int size)
 
 int SensorHandler::getTailData()
 {
-	return(readCapacitivePin(tailPin));
+	return readCapacitivePin(tailPin);
 }
 
 int SensorHandler::getMouthData()
 {
-	return (readCapacitivePin(mouthPin));
+	return readCapacitivePin(mouthPin);
+}
+
+void SensorHandler::getBodyTouches(int data[])
+{
+	for(int i=0; i<3; i++)
+	{
+		data[i] = readCapacitivePin(bodyTouchPins[i]);
+	}
 }
 
 // readCapacitivePin

@@ -37,7 +37,7 @@ GestureHandler::GestureHandler(MapocciTransfer model)
 	isSpinning = false;
 	isRolling = false;
 	isFlipping = false;
-	rotationThreshold = 50;
+	rotationThreshold = 100;
 	
 	//Falling variable initialization
 	isFalling = false;
@@ -53,14 +53,16 @@ GestureHandler::GestureHandler(MapocciTransfer model)
 	isTouching[0] = false;
 	isTouching[1] = false;
 	isTouching[2] = false;
+	Serial.println(isTouching[0]);
 
 	//Tail variable initialization
 	tailThreshold;
 	
-	Serial.println("fuck your mother");
-	
 	//Kiss variable initialization
 	kissThreshold = 20;
+
+	isTest=false;
+	testCount = 0;
 }
 
 void GestureHandler::report(sensorData data)
@@ -82,26 +84,28 @@ void GestureHandler::report(sensorData data)
 		oldTorso[i] = rawData.torso[i] > 20 ? rawData.torso[i] : 0;
 	}
 	
-//	for(int i=0; i<16; i++)
-//	{
-//		Serial.print(oldTorso[i]);
-//		Serial.print('\t');
-//	}
-//	//Serial.print('|');
-//	for(int i=0; i<9; i++)
-//	{
-//		Serial.print(oldBottom[i]);
-//		Serial.print('\t');
-//	}
-//	//Serial.print('|');
-//		for(int i=0; i<14; i++)
-//	{
-//		Serial.print(oldStomach[i]);
-//		Serial.print('\t');
-//	}
-//	Serial.print('|');
-//	Serial.println("");
-	//Serial.println(rawData.mouth);
+	// for(int i=0; i<16; i++)
+	// {
+	// 	Serial.print(oldTorso[i]);
+	// 	Serial.print('\t');
+	// }
+	// // Serial.print('|');
+	// for(int i=0; i<9; i++)
+	// {
+	// 	Serial.print(oldBottom[i]);
+	// 	Serial.print('\t');
+	// }
+	// // Serial.print('|');
+	// 	for(int i=0; i<14; i++)
+	// {
+	// 	Serial.print(oldStomach[i]);
+	// 	Serial.print('\t');
+	// }
+	// //Serial.print('|');
+	// //Serial.println("");
+	// Serial.print(rawData.mouth);
+	// Serial.print('\t');
+	// Serial.println(rawData.bodyTouches[0]);
 	
 	getTouchPadFeatures(means, stds, modes);
 }
@@ -189,43 +193,43 @@ String GestureHandler::getRotating()
 		gesture+=spin;
 	}
 	
-	if(rotationAxis[1]&&!isFlipping)
-	{
-		float force = transfer.transferFlipping(abs(rawData.gyro[1] - nominalRotation));
-		String flip = "Flip=initiated:Speed=" + ftos(force)+"!";
-		gesture+=flip;
-		isFlipping = true;
-	}
-	else if(!rotationAxis[1]&&isFlipping)
-	{
-		isFlipping = false;
-		gesture+= "Flip=ended!";
-	}
-	else if(isFlipping)
-	{
-		float force = transfer.transferFlipping(abs(rawData.gyro[1] - nominalRotation));
-		String flip = "Flip=initiated:Speed=" + ftos(force)+"!";
-		gesture+=flip;
-	}
-	
-	if(rotationAxis[2]&&!isRolling)
-	{
-		float force = transfer.transferRolling(abs(rawData.gyro[2] - nominalRotation));
-		String roll = "Roll=initiated:Speed=" + ftos(force)+"!";
-		gesture+=roll;
-		isRolling = true;
-	}
-	else if(!rotationAxis[2]&&isRolling)
-	{
-		isRolling = false;
-		gesture+= "Roll=ended!";
-	}
-	else if(isRolling)
-	{
-		float force = transfer.transferRolling(abs(rawData.gyro[2] - nominalRotation));
-		String roll = "Roll=initiated:Speed=" + ftos(force)+"!";
-		gesture+=roll;
-	}
+//	if(rotationAxis[1]&&!isFlipping)
+//	{
+//		float force = transfer.transferFlipping(abs(rawData.gyro[1] - nominalRotation));
+//		String flip = "Flip=initiated:Speed=" + ftos(force)+"!";
+//		gesture+=flip;
+//		isFlipping = true;
+//	}
+//	else if(!rotationAxis[1]&&isFlipping)
+//	{
+//		isFlipping = false;
+//		gesture+= "Flip=ended!";
+//	}
+//	else if(isFlipping)
+//	{
+//		float force = transfer.transferFlipping(abs(rawData.gyro[1] - nominalRotation));
+//		String flip = "Flip=initiated:Speed=" + ftos(force)+"!";
+//		gesture+=flip;
+//	}
+//	
+//	if(rotationAxis[2]&&!isRolling)
+//	{
+//		float force = transfer.transferRolling(abs(rawData.gyro[2] - nominalRotation));
+//		String roll = "Roll=initiated:Speed=" + ftos(force)+"!";
+//		gesture+=roll;
+//		isRolling = true;
+//	}
+//	else if(!rotationAxis[2]&&isRolling)
+//	{
+//		isRolling = false;
+//		gesture+= "Roll=ended!";
+//	}
+//	else if(isRolling)
+//	{
+//		float force = transfer.transferRolling(abs(rawData.gyro[2] - nominalRotation));
+//		String roll = "Roll=initiated:Speed=" + ftos(force)+"!";
+//		gesture+=roll;
+//	}
 
 	return gesture;
 }
@@ -302,57 +306,67 @@ String GestureHandler::getUpsideDown()
 String GestureHandler::getTouching()
 {
 	String gesture = "";
-	for(int i=0; i<3; i++)
-	{
-	int i =0;
-		float x  = sqrt(pow(rawData.accel[0]-accelerometerNominal,2) + 
-			pow(rawData.accel[1]-accelerometerNominal,2) + 
-			pow(rawData.accel[2]-accelerometerNominal,2));
-		int axis = ftiMode(rawData.accel, 3);
-		bool touchTest = sums[i] > 50;
-		if(touchTest&&!isTouching[i]&&touchCount[i]==3)
+	float x  = sqrt(pow(rawData.accel[0]-accelerometerNominal,2) + 
+		pow(rawData.accel[1]-accelerometerNominal,2) + 
+		pow(rawData.accel[2]-accelerometerNominal,2));
+	//for(int i=0; i<3; i++)
+	//{
+
+		int i =0;
+		bool touchTest = rawData.bodyTouches[i] > 60;
+		if(touchTest&&!isTest&&testCount==3)
 		{
-			isTouching[i] = true;
-			Serial.println("ACTIVE");
+			isTest = true;
+			gesture+= getTouchGestureString(i);
+			//continue;
 		}
-		else if(touchTest)&&touchCount[i] < 3)
+		if(touchTest)
 		{
-			touchCount[i]++;
+			testCount++;
+			testCount = testCount > 3 ? 3 : testCount;
 		}
-		if(isTouching[i]&&touchCount[i]==0)
+		if(isTest&&testCount==0)
 		{
-			isTouching[i] = false;
+			isTest = false;
 			gesture+= "Touch-"+String(i)+"=ended!";
+			// continue;
 		}
-		else if(isTouching[i])
+		if(!touchTest && testCount > 0)
 		{
-			bool didShake = testShake(rawData.accel, shakingUpper);
-			float force;
-			switch (i)
-			{
-				case 0:
-					 force = transfer.transferTouching(rawData.torso[modes[i]]);
-					break;
-				case 1:
-					 force = transfer.transferTouching(rawData.bottom[modes[i]]);
-					break;
-				case 2:
-					 force = transfer.transferTouching(rawData.stomach[modes[i]]);
-					break;
-				default:
-					 force = 0.00;
-			}
-			float area = transfer.transferTouchArea(stds[i]);
-			gesture+= "Touch-"+String(i)+"=initiated:Pressure=" + ftos(force) + 
-				":Area=" + ftos(area)+":Position=" + ftos(means[i])+
-				":Acceleration=" + String(didShake)+"!";
+			testCount--;
 		}
-		if(!touchTest && touchCount[i] > 0)
+		if(isTest)
 		{
-			touchCount[i]--;
+			gesture+= getTouchGestureString(i);
+			//continue;
 		}
-	}
+
+	//}
 	return gesture;
+}
+
+String GestureHandler::getTouchGestureString(int i)
+{
+	bool didShake = testShake(rawData.accel, shakingUpper);
+	float force;
+	switch (i)
+	{
+		case 0:
+			 force = transfer.transferTouching(rawData.torso[modes[i]]);
+			break;
+		case 1:
+			 force = transfer.transferTouching(rawData.bottom[modes[i]]);
+			break;
+		case 2:
+			 force = transfer.transferTouching(rawData.stomach[modes[i]]);
+			break;
+		default:
+			 force = 0.00;
+	}
+	float area = transfer.transferTouchArea(stds[i]);
+	return "Touch-"+String(i)+"=initiated:Pressure=" + ftos(force) + 
+		":Area=" + ftos(area)+":Position=" + ftos(means[i])+
+		":Acceleration=" + String(didShake)+"!";
 }
 
 //------------------------------------------------------------------------------
@@ -360,7 +374,7 @@ String GestureHandler::getTailTouch()
 {
 	if(rawData.tail>tailThreshold)
 	{
-		return "Tail=Detected!";
+//		return "Tail=Detected!";
 	}
 	return "";
 }
@@ -370,6 +384,7 @@ String GestureHandler::getKiss()
 {
 	if(rawData.mouth>kissThreshold)
 	{
+		
 		return "Kiss=Detected!";
 	}
 	return "";
