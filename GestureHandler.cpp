@@ -61,8 +61,8 @@ GestureHandler::GestureHandler(MapocciTransfer model)
 	//Kiss variable initialization
 	kissThreshold = 20;
 
-	isTest=false;
-	testCount = 0;
+	isTorso=false;
+	torsoCount = 0;
 }
 
 void GestureHandler::report(sensorData data)
@@ -303,45 +303,117 @@ String GestureHandler::getUpsideDown()
 	return "";
 }
 
-String GestureHandler::getTouching()
+String GestureHandler::getTorso()
 {
 	String gesture = "";
 	float x  = sqrt(pow(rawData.accel[0]-accelerometerNominal,2) + 
 		pow(rawData.accel[1]-accelerometerNominal,2) + 
 		pow(rawData.accel[2]-accelerometerNominal,2));
-	//for(int i=0; i<3; i++)
-	//{
+	int i = 0;
+	bool touchTest = rawData.bodyTouches[i] > 60;
+	if(touchTest&&!isTorso&&torsoCount==3)
+	{
+		isTorso = true;
+		gesture+= getTouchGestureString(i);
+		return gesture;
+	}
+	if(touchTest)
+	{
+		torsoCount++;
+		torsoCount = torsoCount > 3 ? 3 : torsoCount;
+	}
+	if(isTorso&&torsoCount==0)
+	{
+		isTorso = false;
+		gesture+= "Touch-"+String(i)+"=ended!";
+		return gesture;
+	}
+	if(!touchTest && torsoCount > 0)
+	{
+		torsoCount--;
+	}
+	if(isTorso)
+	{
+		gesture+= getTouchGestureString(i);
+		return gesture;
+	}
+	touchCount[i] = torsoCount;
+	return gesture;
+}
 
-		int i =0;
-		bool touchTest = rawData.bodyTouches[i] > 60;
-		if(touchTest&&!isTest&&testCount==3)
-		{
-			isTest = true;
-			gesture+= getTouchGestureString(i);
-			//continue;
-		}
-		if(touchTest)
-		{
-			testCount++;
-			testCount = testCount > 3 ? 3 : testCount;
-		}
-		if(isTest&&testCount==0)
-		{
-			isTest = false;
-			gesture+= "Touch-"+String(i)+"=ended!";
-			// continue;
-		}
-		if(!touchTest && testCount > 0)
-		{
-			testCount--;
-		}
-		if(isTest)
-		{
-			gesture+= getTouchGestureString(i);
-			//continue;
-		}
+String GestureHandler::getBottom()
+{
+	String gesture = "";
+	float x  = sqrt(pow(rawData.accel[0]-accelerometerNominal,2) + 
+		pow(rawData.accel[1]-accelerometerNominal,2) + 
+		pow(rawData.accel[2]-accelerometerNominal,2));
+	int i = 1;
+	bool touchTest = rawData.bodyTouches[i] > 60;
+	if(touchTest&&!isBottom&&bottomCount==3)
+	{
+		isBottom = true;
+		gesture+= getTouchGestureString(i);
+		return gesture;
+	}
+	if(touchTest)
+	{
+		bottomCount++;
+		bottomCount = bottomCount > 3 ? 3 : bottomCount;
+	}
+	if(isBottom&&bottomCount==0)
+	{
+		isBottom = false;
+		gesture+= "Touch-"+String(i)+"=ended!";
+		return gesture;
+	}
+	if(!touchTest && bottomCount > 0)
+	{
+		bottomCount--;
+	}
+	if(isBottom)
+	{
+		gesture+= getTouchGestureString(i);
+		return gesture;
+	}
+	touchCount[i] = bottomCount;
+	return gesture;
+}
 
-	//}
+String GestureHandler::getStomach()
+{
+	String gesture = "";
+	float x  = sqrt(pow(rawData.accel[0]-accelerometerNominal,2) + 
+		pow(rawData.accel[1]-accelerometerNominal,2) + 
+		pow(rawData.accel[2]-accelerometerNominal,2));
+	int i = 2;
+	bool touchTest = rawData.bodyTouches[i] > 60;
+	if(touchTest&&!isStomach&&stomachCount==3)
+	{
+		isStomach = true;
+		gesture+= getTouchGestureString(i);
+		return gesture;
+	}
+	if(touchTest)
+	{
+		stomachCount++;
+		stomachCount = stomachCount > 3 ? 3 : stomachCount;
+	}
+	if(isStomach&&stomachCount==0)
+	{
+		isStomach = false;
+		gesture+= "Touch-"+String(i)+"=ended!";
+		return gesture;
+	}
+	if(!touchTest && stomachCount > 0)
+	{
+		stomachCount--;
+	}
+	if(isStomach)
+	{
+		gesture+= getTouchGestureString(i);
+		return gesture;
+	}
+	touchCount[i] = stomachCount;
 	return gesture;
 }
 

@@ -17,7 +17,7 @@ CHANGE LOG
 #include "General.h"
 
 
-#ifdef __cplusplus
+#ifdef __cplusplus`
 extern "C" {
 #endif
 void loop();
@@ -47,6 +47,7 @@ class MapocciTransfer
 		float maxShaking;
 };
 #endif
+
 		
 		
 		

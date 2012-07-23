@@ -41,7 +41,9 @@ class GestureHandler
 		String getRotating();
 		String getFalling();
 		String getUpsideDown();
-		String getTouching();
+		String getTorso();
+		String getBottom();
+		String getStomach();
 		String getTailTouch();
 		String getKiss();
 		
@@ -116,8 +118,12 @@ class GestureHandler
 		//Kiss detection helper variables
 		int kissThreshold;
 
-		bool isTest;
-		int testCount;
+		bool isTorso;
+		int torsoCount;
+		bool isBottom;
+		int bottomCount;
+		bool isStomach;
+		int stomachCount;
 		
 };
 
