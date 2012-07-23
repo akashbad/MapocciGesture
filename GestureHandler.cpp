@@ -1,15 +1,5 @@
 /*GestureHandler.cpp
 	The  class responsible for processing all of the data and deciding if a gesture has been detected
-
-CHANGE LOG	
-***********************************************************************************************
--file created 01/06/12
--implementation of shake detection and dummy functionality 01/06/12
--completion of the first version of working shake detection and reporting 04/06/12
--completion of the first version of working rotation detection
-			KNOWN BUG: false positives especially when shaking, think of ways to isolate this,
-									more real world data needed to adequately threshold
-***********************************************************************************************
 */
 
 #include "Arduino.h"
@@ -84,39 +74,43 @@ void GestureHandler::report(sensorData data)
 		oldTorso[i] = rawData.torso[i] > 20 ? rawData.torso[i] : 0;
 	}
 	
-	// for(int i=0; i<16; i++)
-	// {
-	// 	Serial.print(oldTorso[i]);
-	// 	Serial.print('\t');
-	// }
-	// // Serial.print('|');
-	// for(int i=0; i<9; i++)
-	// {
-	// 	Serial.print(oldBottom[i]);
-	// 	Serial.print('\t');
-	// }
-	// // Serial.print('|');
-	// 	for(int i=0; i<14; i++)
-	// {
-	// 	Serial.print(oldStomach[i]);
-	// 	Serial.print('\t');
-	// }
-	// //Serial.print('|');
-	// //Serial.println("");
-	// Serial.print(rawData.mouth);
-	// Serial.print('\t');
-	// Serial.println(rawData.bodyTouches[0]);
+	for(int i=0; i<16; i++)
+	{
+		Serial.print(oldTorso[i]);
+		Serial.print('\t');
+	}
+	// Serial.print('|');
+	for(int i=0; i<9; i++)
+	{
+		Serial.print(oldBottom[i]);
+		Serial.print('\t');
+	}
+	// Serial.print('|');
+		for(int i=0; i<14; i++)
+	{
+		Serial.print(oldStomach[i]);
+		Serial.print('\t');
+	}
+	//Serial.print('|');
+	//Serial.println("");
+	Serial.print(rawData.mouth);
+	Serial.print('\t');
+	Serial.println(rawData.bodyTouches[0]);
 	
 	getTouchPadFeatures(means, stds, modes);
 }
 
 //------------------------------------------------------------------------------
+/**
+*	@see testShake()
+*	@see ftos()
+*/
 String GestureHandler::getShaking()
 {
 	float x  = sqrt(pow(rawData.accel[0]-accelerometerNominal,2) + 
 			pow(rawData.accel[1]-accelerometerNominal,2) + 
 			pow(rawData.accel[2]-accelerometerNominal,2));
-	int axis = ftiMode(rawData.accel, 3);
+	int axis = iMode(rawData.accel, 3);
 	if(testShake(rawData.accel, shakingUpper)&&!isShaking&&!isFalling&&shakeCount==5)
 	{
 		isShaking = true;
@@ -278,24 +272,33 @@ String GestureHandler::getFalling()
 void GestureHandler::getTouchPadFeatures(float means[], float stds[], int modes[])
 {
 	//Get the means
-	means[0] = ftfMean(oldTorso, 16);
-	means[1] = ftfMean(oldBottom,9);
-	means[2] = ftfMean(oldStomach, 14);
+	means[0] = fMean(oldTorso, 16);
+	means[1] = fMean(oldBottom,9);
+	means[2] = fMean(oldStomach, 14);
 	
 	//Get the stds
-	stds[0] = ftfStd(oldTorso, 16);
-	stds[1] = ftfStd(oldBottom,9);
-	stds[2] = ftfStd(oldStomach, 14);
+	stds[0] = fStd(oldTorso, 16);
+	stds[1] = fStd(oldBottom,9);
+	stds[2] = fStd(oldStomach, 14);
 	
 	//Get the modes
-	modes[0] = ftiMode(oldTorso, 16);
-	modes[1] = ftiMode(oldBottom,9);
-	modes[2] = ftiMode(oldStomach, 14);
+	modes[0] = iMode(oldTorso, 16);
+	modes[1] = iMode(oldBottom,9);
+	modes[2] = iMode(oldStomach, 14);
 	
 	//Get the sums
 	sums[0] = intSum(oldTorso, 16);
 	sums[1] = intSum(oldBottom, 9);
 	sums[2] = intSum(oldStomach, 14);
+
+	// Serial.print(means[0]);
+	// Serial.print('\t');
+	// Serial.print(stds[0]);
+	// Serial.print('\t');
+	// Serial.print(modes[0]);
+	// Serial.print('\t');
+	// Serial.print(sums[0]);
+	// Serial.println("");
 }
 
 String GestureHandler::getUpsideDown()
@@ -310,7 +313,7 @@ String GestureHandler::getTorso()
 		pow(rawData.accel[1]-accelerometerNominal,2) + 
 		pow(rawData.accel[2]-accelerometerNominal,2));
 	int i = 0;
-	bool touchTest = rawData.bodyTouches[i] > 60;
+	bool touchTest = rawData.bodyTouches[i] > 60 && sums[i] > 100;
 	if(touchTest&&!isTorso&&torsoCount==3)
 	{
 		isTorso = true;

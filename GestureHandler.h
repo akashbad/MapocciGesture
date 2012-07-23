@@ -1,11 +1,5 @@
 /*GestureHandler.h
 	The interface definition for the GestureHandler class which will take input data and 
-
-CHANGE LOG	
-***********************************************************************************************
--file created 01/06/12
--listing of public methods and of shaking private variables and methods 01/06/31
-***********************************************************************************************
 */
 
 #ifndef GestureHandler_H_

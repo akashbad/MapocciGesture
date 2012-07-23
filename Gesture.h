@@ -1,12 +1,5 @@
 /*Gesture.h
 	The interface definition for the Gesture class which will run the three main processes
-
-CHANGE LOG	
-***********************************************************************************************
--file created 31/05/12
--primary interface design and definition 31/05/12
--addition of general.h includes 01/06/12
-***********************************************************************************************
 */
 
 #ifndef Gesture_H_
@@ -32,7 +25,13 @@ void setup();
 #endif
 
 
-//Create a class  for the arduino to use
+/**
+* This is the top level class for the Mapocci gesture recognition system.
+*	An instance of this class is created per Mapocci and the three
+*	methods within this class segment the three major steps of the
+*	gesture recognition process: data collection, data processing,
+*	and gesture sending.
+*/
 class Gesture
 {
 	//The three methods refer to the three stages to the process. These will be repeated over and over

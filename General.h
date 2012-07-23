@@ -1,11 +1,5 @@
 /*General.h
 	The interface definition for a General list of functions to be used by all programs
-
-CHANGE LOG	
-***********************************************************************************************
--file created 01/06/12
--primary interface design and definition 01/06/12
-***********************************************************************************************
 */
 
 #ifndef General_H_
@@ -23,17 +17,19 @@ void setup();
 } //extern "C"
 #endif
 
-//The sensorData struct which is used to store data
+/**
+* The struct to hold the raw data read by our sensors
+*/
 typedef struct {
-	int accel[3];
-	int gyro[3];
-	int torso[16];
-	int stomach[14];
-	int bottom[9];
-	int tail;
-	int mouth;
-	int bodyTouches[3];
-} sensorData;
+	int accel[3];	///<An array to hold acceleration data on 3 axis: x,y,z
+	int gyro[3]; 	///<An array to hold gyroscope data on 3 axis: y,p,r
+	int torso[16];	///<An array to hold touch sensor data on the 16 torso sensors
+	int stomach[14];///<An array to hold touch sensor data on the 14 stomach sensors
+	int bottom[9];	///<An array to hold touch sensor data on the 9 bottom sensors
+	int tail;		///<An int to hold capacitive sensor data for the tail
+	int mouth;		///<An int to hold capacitive sensor data for the mouth
+	int bodyTouches[3];	///<An array to capacitive sensor data for the torso, bottom, and stomach
+} sensorData;	
 
 //The int array copy method
 	void copyInt(int write[], int read[], int length);
@@ -54,14 +50,14 @@ typedef struct {
 //The float sum method
 	float floatSum(float data[], int length);
 	
-//The float valued float mean method
-	float ftfMean(int data[], int length);
+//The float valued mean method
+	float fMean(int data[], int length);
 	
-//The float values float std method
-	float ftfStd(int data[], int length);
+//The float valued std method
+	float fStd(int data[], int length);
 
-//The float to int mode method
-	int ftiMode(int data[], int length);
+//The int valued mode method
+	int iMode(int data[], int length);
 	
 //The float to string method
 	String ftos(float input);

@@ -32,7 +32,12 @@ int readCapacitivePin(int pinToMeasure);
 #endif
 
 
-//Create a class  for the SensorHandler to use
+/**
+* The class responsible for collecting all the raw data. This is  the
+*	only class that interacts with the sensors. Performing all of the 
+*	data collection and returning it. The methods of this class are
+*	called by the instance of Gesture which uses stores the values
+*	produced within a sensorData instance.*/
 class SensorHandler
 {
 	//The methods needed to read in the proper data from each of the adc pins, there is a single
@@ -54,25 +59,24 @@ class SensorHandler
 	//Methods to multiplex the sensors that share an adc pin and variables to hold pin numbers
 	private:
 		
-		void torsoMultiplexer(int node);
-		void stomachMultiplexer(int node);
-		void bottomMultiplexer(int node);
+		void fabricMultiplexer(int node, int control[]);
 		int removeDeadPixels(int data[], int index, int size);
-		int deadPixThreshold;
+		int deadPixThreshold; ///<The threshold for a dead fabric pixel
+		int fabricScaleFactor; ///<The amount to be subtracted from each fabric
 		
 
 
-		int accelPins[3];
-		int gyroPins[3];
-		int torsoPin;
-		int stomachPin;
-		int bottomPin;
-		int torsoControl[4];
-		int stomachControl[4];
-		int bottomControl[4];
-		int tailPin;
-		int mouthPin;
-		int bodyTouchPins[3];
+		int accelPins[3];	///<An array to store the accelerometer pin numbers
+		int gyroPins[3];	///<An array to store the gyroscope pin numbers
+		int torsoPin;		///<The analog input pin connected to the torso circuitry
+		int stomachPin;		///<The analog input pin connected to the stomach circuitry
+		int bottomPin;		///<The analog input pin connected to the bottom circuitry
+		int torsoControl[4];	///<An array to store pins connected to the torso multiplexer
+		int stomachControl[4];	///<An array to store pins connected to the stomach multiplexer
+		int bottomControl[4];	///<An array to store pins connected to the bottom multiplexer
+		int tailPin;		///<The digital pin connected to the tail
+		int mouthPin;		///<The digital pin connected to the mouth
+		int bodyTouchPins[3];	///<An array to store digital pin numbers connected to the capacitive body sensors
 };
 
 #endif

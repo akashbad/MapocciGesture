@@ -2,12 +2,6 @@
 	The interface for a set of transfer function for a variety of gestures, taking measured features
 	and transfering them to the "force" parameter used to measure the Mapocci arousal
 	based on the gesture
-
-CHANGE LOG	
-***********************************************************************************************
--file created 01/06/12
--primary interface design and definition 01/06/12
-***********************************************************************************************
 */
 
 #ifndef MapocciTransfer_H_
@@ -27,6 +21,15 @@ void setup();
 } //extern "C"
 #endif
 
+/** 
+* The class responsible for mapping feature values.
+*	This class was created to allow for the extension of the
+*	Mapocci to more complicated mathematical models. It takes in
+*	a set of features from each gesture and returns a single value.
+*	As of now the class acts to simple map values but could be
+*	implemented with more complicated transfer functions.
+*	
+*/
 class MapocciTransfer
 {
 	public:
@@ -34,17 +37,19 @@ class MapocciTransfer
 		//The transfer function for shaking
 		float transferShaking(float amplitude);
 		//The transfer functions for rotation
-		float transferFlipping(float velocity);
-		float transferRolling(float velocity);
-		float transferSpinning(float velocity);
+		float transferFlipping(int velocity);
+		float transferRolling(int velocity);
+		float transferSpinning(int velocity);
 		float transferTouching(float pressure);
 		float transferTouchArea(float std);
 		
 	private:
-		float minForce;
-		float maxForce;
-		float minShaking;
-		float maxShaking;
+		float minForce; ///<The minimum force value for Mapocci gestures
+		float maxForce; ///<The maximum force value for Mapocci gestures
+		float minShaking; ///<The minimum measurable shaking value
+		float maxShaking; ///<The maximum shaking value
+		float minRotating; ///<The minimum rotation velocity
+		float maxRotating; ///<The maxium rotation velocity
 };
 #endif
 
