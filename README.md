@@ -1,4 +1,4 @@
-MapocciGesture
+MapocciGesture		{#index}
 ===============
 
 The repository for the libraries neccessary for sensor input and gesture recognition. This project consists of libraries responsible for collecting and processing data. It also contains the framework for a more sophisticated send to the emotional model.
@@ -47,7 +47,3 @@ void loop()
   gesture.send(gesture.process(gHandler, gesture.collect(sHandler)));
 }
 ~~~
-
-\page doe forReal
-\tableofcontents
-Brosef
