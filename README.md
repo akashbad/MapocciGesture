@@ -6,7 +6,6 @@ The repository for the libraries neccessary for sensor input and gesture recogni
 In order to appropriately integrate this code with the rest of the project move these files to a folder within the arduino libraries. See the following code block for an example of how to include this functionality into a sketch.
 
 ~~~{.c}
-```c
 //Make sure to include the libraries
 #include <Gesture.h>
 #include <General.h>
@@ -47,5 +46,4 @@ void loop()
   //This method will not do anything for now, the gestures recieved this loop will be stored in gestures.
   gesture.send(gesture.process(gHandler, gesture.collect(sHandler)));
 }
-```
 ~~~
