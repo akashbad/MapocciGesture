@@ -87,7 +87,7 @@ class GestureHandler
 		bool isUpsideDown;	///<The boolean determining upsidedown state
 		
 		//Helper function for the touchPads
-		void getTouchPadFeatures(float means[], float stds[], int modes[]);
+		void getTouchPadFeatures();
 
 		String getTouchGestureString(int i);
 

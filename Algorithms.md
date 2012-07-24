@@ -9,7 +9,7 @@ This page outlines the generic structure of the algorithms used to detect all of
 Generic Algorithm  			{#generic}
 -----------------
 
-This is the simple algorithm that is used in the detection of rotations, falling, upside down, tail touches, and kisses.
+This is the simple algorithm that is used in the detection of rotations, falling, tail touches, and kisses.
 
 ### Components ###
 The necessary components in running this algorithm are a **test case** and a **state** variable. 
@@ -42,7 +42,7 @@ return "";
 Algorithm + Hysterisis 		{#hysterisis}
 ----------------------
 
-This follows the same basic structure as the original algorithm but includes 2 more code blocks in order to establish a more time averaged detection scheme. The key difference in these algorithms is the use of a counting variable to prevent a single noisy sample from causing a false positive or negative. This is used for the detection of shakes and body touches because the sensors are much noisier.
+This follows the same basic structure as the original algorithm but includes 2 more code blocks in order to establish a more time averaged detection scheme. The key difference in these algorithms is the use of a counting variable to prevent a single noisy sample from causing a false positive or negative. This is used for the detection of shakes, upside down, and body touches because the sensors are much noisier.
 
 ### Components ###
 In addition to the components needed in the original algorithm, **test case** and **state**, the inclusion of hysterisis requires a **count** variable. 

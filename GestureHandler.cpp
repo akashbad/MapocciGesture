@@ -42,7 +42,8 @@ GestureHandler::GestureHandler(MapocciTransfer model)
 	
 	//Falling variable initialization
 	isFalling = false;
-	fallCount = 0;
+	fallThresholdHigh = 20.0;
+	fallThresholdLow = 10.0;
 	
 	//Upside down variable initialization
 	isUpsideDown = false;
@@ -116,12 +117,11 @@ void GestureHandler::report(sensorData data)
 	Serial.print('\t');
 	Serial.println(rawData.bodyTouches[0]);
 	
-	getTouchPadFeatures(means, stds, modes);
+	getTouchPadFeatures();
 }
 
-//------------------------------------------------------------------------------
 /**
-* The public method to return shake gestures.
+* The method to return shake gestures.
 *	This method uses a version of the general gesture algorithm with hysterisis, which
 *	is explained in more depth on the @ref algorithms page. More specifically
 *	this algorithm is described <a href="http://stackoverflow.com/questions/150446/how-do-i-detect-when-someone-shakes-an-iphone">
@@ -191,6 +191,7 @@ String GestureHandler::getShaking()
 *	@param threshold the difference threshold
 *	@return a boolean determining if the threshold was exceeded on
 *		at least 2 axis
+*	@see getShaking()
 */
 bool GestureHandler::testShake(int current[], float threshold)
 {
@@ -205,7 +206,23 @@ bool GestureHandler::testShake(int current[], float threshold)
 	return x;
 }
 
-//------------------------------------------------------------------------------
+/**
+* The method to check for rotation on any of the three axis.
+*	This method uses the standard gesture detection algorithm which
+*	is explained in more depth on the @ref algorithms page. The test
+*	condition for this is a value above the rotation threshold. Each
+*	axis is evaluated seperately because they connote slightly
+*	different gestures.
+*
+*	@return an empty String if no gesture is detected or "Spin=initated" or
+*		"Spin=ended" gesture if one is detected. The same format
+*		follows to Rolling and Flipping
+*	@see checkRotation the method to get the test condition
+*	@see MapocciTransfer::transferSpinning
+*	@see MapocciTransfer::transferRolling
+*	@see MapocciTransfer::transferFlipping
+*	@see ftos()
+*/
 String GestureHandler::getRotating()
 {
 	bool rotationAxis[3];
@@ -275,23 +292,42 @@ String GestureHandler::getRotating()
 	return gesture;
 }
 
+/**
+* The method that checks if a given gyroscope axis is rotating.
+*	This checks that by subtracting the nominal gyroscope value
+*	and then comparing it to the threshold.
+*
+*	@param axis the number of the axis to be checked
+*	@return a boolean determining if it is rotating or not
+*	@see getRotating()
+*/
 bool GestureHandler::checkRotation(int axis)
 {
 	return abs(rawData.gyro[axis] - nominalRotation)>rotationThreshold;
 }
 
-//------------------------------------------------------------------------------
+/**
+* The method to check for free fall.
+*	This method uses the standard gesture detection algorithm which
+*	is explained in more depth on the @ref algorithms page. The test
+*	condition for this is if the total magnitude of acceleration is near
+*	to 0, indicating free fall. This gesture has no features.
+*
+*	@return an empty String if no gesture is detected or "Falling=initated" or
+*		"Falling=ended" gesture if one is detected.
+*/
 String GestureHandler::getFalling()
 {
 	float magnitude  = sqrt(pow(rawData.accel[0]-accelerometerNominal,2) + 
 							pow(rawData.accel[1]-accelerometerNominal,2) + 
 							pow(rawData.accel[2]-accelerometerNominal,2));
-	if(magnitude < 10.0&&!isFalling)
+	if(magnitude < fallThresholdLow&&!isFalling)
 	{
 		isFalling = true;
 		return "Falling=initiated!";
 	}
-	if(isFalling&&magnitude >20.0 &&){
+	if(isFalling&&magnitude >fallThresholdHigh)
+	{
 		isFalling = false;
 		return "Falling=ended!";
 	}
@@ -302,8 +338,18 @@ String GestureHandler::getFalling()
 	return ("");
 }
 
-//------------------------------------------------------------------------------
-void GestureHandler::getTouchPadFeatures(float means[], float stds[], int modes[])
+/**
+* A method to aquire all of the touch fabric features.
+*	This method obtains the means, standard deviations, modes,
+*	and sums for each of the touch pads. This is also the place
+*	to print out the features if debugging.
+*
+*	@see fMean()
+*	@see fStd()
+*	@see iMode()
+*	@see intSum()
+*/
+void GestureHandler::getTouchPadFeatures()
 {
 	//Get the means
 	means[0] = fMean(oldTorso, 16);
@@ -335,11 +381,36 @@ void GestureHandler::getTouchPadFeatures(float means[], float stds[], int modes[
 	// Serial.println("");
 }
 
+/**
+* The method to check if the Mapocci is upside down.
+*	This method uses a version of the general gesture algorithm with hysterisis, which
+*	is explained in more depth on the @ref algorithms page. The test condition
+*	of this gesture is the acceleration on the z-axis of the accelerometer
+*	which should change greatly in magnitude if the Mapocci is upside down.
+*
+*	@return an empty String if no gesture is detected or "Upside_Down=initated" or
+*		"Upside_Down=ended" gesture if one is detected.
+*/
 String GestureHandler::getUpsideDown()
 {
 	return "";
 }
 
+/**
+* The method to test for torso touches.
+*	This method uses a version of the general gesture algorithm with hysterisis, which
+*	is explained in more depth on the @ref algorithms page. This method
+* 	is identical to getBottom() and getStomach() but they are duplicated
+*	because of a bug with storing state in an array. The test condition for
+*	a touch is the presence of a capacitive signal on the torso touch sensor
+*	and significant activation on the torso fabric (read a sum). The features
+*	extracted include the mean (location), pressure (mode), area (standard deviation),
+*	and whether or not the accelerometer felt a shake.
+*
+*	@return an empty String if no gesture is detected or "Touch-0=initated" or
+*		"Touch-0=ended" gesture if one is detected.
+*	@see getTouchGestureString() a method to construct the proper gesture
+*/
 String GestureHandler::getTorso()
 {
 	String gesture = "";
@@ -377,6 +448,21 @@ String GestureHandler::getTorso()
 	return gesture;
 }
 
+/**
+* The method to test for bottom touches.
+*	This method uses a version of the general gesture algorithm with hysterisis, which
+*	is explained in more depth on the @ref algorithms page. This method
+* 	is identical to getTorso() and getStomach() but they are duplicated
+*	because of a bug with storing state in an array. The test condition for
+*	a touch is the presence of a capacitive signal on the bottom touch sensor
+*	and significant activation on the bottom fabric (read a sum). The features
+*	extracted include the mean (location), pressure (mode), area (standard deviation),
+*	and whether or not the accelerometer felt a shake.
+*
+*	@return an empty String if no gesture is detected or "Touch-1=initated" or
+*		"Touch-1=ended" gesture if one is detected.
+*	@see getTouchGestureString() a method to construct the proper gesture
+*/
 String GestureHandler::getBottom()
 {
 	String gesture = "";
@@ -414,6 +500,21 @@ String GestureHandler::getBottom()
 	return gesture;
 }
 
+/**
+* The method to test for stomach touches.
+*	This method uses a version of the general gesture algorithm with hysterisis, which
+*	is explained in more depth on the @ref algorithms page. This method
+* 	is identical to getBottom() and getTorso() but they are duplicated
+*	because of a bug with storing state in an array. The test condition for
+*	a touch is the presence of a capacitive signal on the stomach touch sensor
+*	and significant activation on the stomach fabric (read a sum). The features
+*	extracted include the mean (location), pressure (mode), area (standard deviation),
+*	and whether or not the accelerometer felt a shake.
+*
+*	@return an empty String if no gesture is detected or "Touch-2=initated" or
+*		"Touch-2=ended" gesture if one is detected.
+*	@see getTouchGestureString() a method to construct the proper gesture
+*/
 String GestureHandler::getStomach()
 {
 	String gesture = "";
@@ -451,6 +552,19 @@ String GestureHandler::getStomach()
 	return gesture;
 }
 
+/**
+* A method to construct the gesture message for body touches.
+*	This method takes the index of the gesture and looks through
+*	the stored features to properly construct the message according
+*	to the grammar.
+*
+*	@param i the index of the touch
+*	@return the String representing the gesture with all of the 
+*		features inserted
+*	@see getTorso()
+*	@see getBottom()
+*	@see getStomach()
+*/
 String GestureHandler::getTouchGestureString(int i)
 {
 	bool didShake = testShake(rawData.accel, shakingUpper);
@@ -475,7 +589,16 @@ String GestureHandler::getTouchGestureString(int i)
 		":Acceleration=" + String(didShake)+"!";
 }
 
-//------------------------------------------------------------------------------
+/**
+* The method to check for tail touches.
+*	This method uses the standard gesture detection algorithm which
+*	is explained in more depth on the @ref algorithms page. The test
+*	condition for this is if the measured capacitance exceeds the 
+*	threshold chosen for the tail. This gesture has no features.
+*
+*	@return an empty String if no gesture is detected or "Tail=initated" or
+*		"Tail=ended" gesture if one is detected.
+*/
 String GestureHandler::getTailTouch()
 {
 	if(rawData.tail>tailThreshold&&!isTailTouching)
@@ -495,7 +618,16 @@ String GestureHandler::getTailTouch()
 	return "";
 }
 
-//------------------------------------------------------------------------------
+/**
+* The method to check for mouth touches.
+*	This method uses the standard gesture detection algorithm which
+*	is explained in more depth on the @ref algorithms page. The test
+*	condition for this is if the measured capacitance exceeds the 
+*	threshold chosen for the mouth. This gesture has no features.
+*
+*	@return an empty String if no gesture is detected or "Kiss=initated" or
+*		"Kiss=ended" gesture if one is detected.
+*/
 String GestureHandler::getKiss()
 {
 	if(rawData.mouth>kissThreshold&&!isKissing)
@@ -515,7 +647,11 @@ String GestureHandler::getKiss()
 	return "";
 }
 
-//------------------------------------------------------------------------------
+/**
+* A method to store data that needs to be remembered for the GestureHandler
+*	This method only saves acceleration data now but could be used
+*	for more data if needed in the future.
+*/
 void GestureHandler::update()
 {
 	//Copy over the rest of the data
