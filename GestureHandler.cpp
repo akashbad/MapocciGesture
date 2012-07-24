@@ -122,24 +122,37 @@ void GestureHandler::report(sensorData data)
 //------------------------------------------------------------------------------
 /**
 * The public method to return shake gestures.
-*	This method uses an algorithm described 
-*	<a href="http://stackoverflow.com/questions/150446/how-do-i-detect-when-someone-shakes-an-iphone">
-*	here</a>. The basic idea of the algorithm is that it looks \ref
-*	@see testShake()
+*	This method uses a version of the general gesture algorithm with hysterisis, which
+*	is explained in more depth on the @ref algorithms page. More specifically
+*	this algorithm is described <a href="http://stackoverflow.com/questions/150446/how-do-i-detect-when-someone-shakes-an-iphone">
+*	here</a>. In addition, this method performed a high pass filter on the
+*	acceleration magnitude which is then used as a feature. Also the axis
+*	on which the acceleration was highest is used as a feature. Finally
+*	a special condition is added which prevents shaking from being activated
+*	if the Mapocci is in free fall.
+*
+*	@return an empty String if no gesture is detected or "Shake=initated" or
+*		"Shake=ended" gesture if one is detected.
+*	@see testShake() the test condition for the algorithm
+*	@see MapocciTransfer::transferShaking()
 *	@see ftos()
 */
 String GestureHandler::getShaking()
 {
+	//Obtain the total magnitude of the acceleration and store it in x
 	float x  = sqrt(pow(rawData.accel[0]-accelerometerNominal,2) + 
 			pow(rawData.accel[1]-accelerometerNominal,2) + 
 			pow(rawData.accel[2]-accelerometerNominal,2));
+	//Also find the axis on which the acceleration is highest
 	int axis = iMode(rawData.accel, 3);
+	//See the general gesture algorithm skeleton
 	if(testShake(rawData.accel, shakingUpper)&&!isShaking&&!isFalling&&shakeCount==5)
 	{
 		isShaking = true;
 
 		filteredShake = x*0.6 + filteredShake*0.4;
 		float force = transfer.transferShaking(filteredShake);
+		//The correctly formatted acceleration message
 		return "Shake=initiated:Acceleration=" + ftos(force) + 
 			":Axis=" + String(axis)+"!";
 	}
@@ -168,6 +181,17 @@ String GestureHandler::getShaking()
 	return "";
 }
 
+/**
+* The test condition for the shake gesture.
+*	This method checks to see if the difference in acceleration
+*	between this cycle and the last on at least 2 of the axis 
+*	is more than the given threshold.
+*	
+*	@param current[] the new acceleration data for this cycle
+*	@param threshold the difference threshold
+*	@return a boolean determining if the threshold was exceeded on
+*		at least 2 axis
+*/
 bool GestureHandler::testShake(int current[], float threshold)
 {
 	float deltas[3];
@@ -259,11 +283,6 @@ bool GestureHandler::checkRotation(int axis)
 //------------------------------------------------------------------------------
 String GestureHandler::getFalling()
 {
-	float deltas[3];
-	for(int i = 0; i<3; i++)
-	{
-		deltas[i] = fabs(rawData.accel[i] - accelerometerNominal);
-	}
 	float magnitude  = sqrt(pow(rawData.accel[0]-accelerometerNominal,2) + 
 							pow(rawData.accel[1]-accelerometerNominal,2) + 
 							pow(rawData.accel[2]-accelerometerNominal,2));
@@ -272,17 +291,9 @@ String GestureHandler::getFalling()
 		isFalling = true;
 		return "Falling=initiated!";
 	}
-	else if(magnitude < 10.0)
-	{
-		fallCount++;
-	}
-	else if(isFalling&&magnitude >20.0 && fallCount == 0){
+	if(isFalling&&magnitude >20.0 &&){
 		isFalling = false;
 		return "Falling=ended!";
-	}
-	else if(magnitude > 20.0 && fallCount > 0)
-	{
-		fallCount--;
 	}
 	if(isFalling)
 	{
@@ -467,9 +478,19 @@ String GestureHandler::getTouchGestureString(int i)
 //------------------------------------------------------------------------------
 String GestureHandler::getTailTouch()
 {
-	if(rawData.tail>tailThreshold)
+	if(rawData.tail>tailThreshold&&!isTailTouching)
 	{
-//		return "Tail=Detected!";
+		isTailTouching = true;
+		return "Tail=initated!";
+	}
+	if(rawData.tail<tailThreshold&&isTailTouching)
+	{
+		isTailTouching = false;
+		return "Tail=ended";
+	}
+	if(isTailTouching)
+	{
+		return "Tail=initiated";
 	}
 	return "";
 }
@@ -477,10 +498,19 @@ String GestureHandler::getTailTouch()
 //------------------------------------------------------------------------------
 String GestureHandler::getKiss()
 {
-	if(rawData.mouth>kissThreshold)
+	if(rawData.mouth>kissThreshold&&!isKissing)
 	{
-		
-		return "Kiss=Detected!";
+		isKissing = true;
+		return "Kiss=initated!";
+	}
+	if(rawData.mouth<kissThreshold&&isKissing)
+	{
+		isKissing = false;
+		return "Kiss=ended";
+	}
+	if(isKissing)
+	{
+		return "Kiss=initiated";
 	}
 	return "";
 }

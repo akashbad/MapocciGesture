@@ -80,8 +80,9 @@ class GestureHandler
 		
 		//Helper variables for falling
 		bool isFalling; ///<The boolean determining falling state
-		int fallCount;	///<A counter used in hysterisis of falling
-		
+		int fallThresholdHigh; ///<The the upper threshold for falling
+		int fallThresholdLow; ///<The lower threshold for falling
+
 		//Helper variable for upside down
 		bool isUpsideDown;	///<The boolean determining upsidedown state
 		
@@ -103,9 +104,11 @@ class GestureHandler
 		
 		//Tail detection helper variables
 		int tailThreshold;	///<The capacitance threshold for the tail
+		bool isTailTouching; ///<The boolean determining tail touch state
 		
 		//Kiss detection helper variables
 		int kissThreshold; ///<The capacitance threshold for the mouth
+		bool isKissing; ///<The boolean determining mouth touch state
 
 		bool isTorso;	///<The boolean determining torso touch state
 		int torsoCount;	///<A counter used in hysterisis of torso touches
