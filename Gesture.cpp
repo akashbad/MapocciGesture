@@ -84,7 +84,7 @@ String Gesture::process(GestureHandler *pHandler, sensorData data)
 *	message sending framework is required for the list of gestures recognized
 *	this cycle
 *
-*	@param gestures, the string containing the list of gestures identified
+*	@param gestures the string containing the list of gestures identified
 *		this cycle
 */
 void Gesture::send(String gestures)

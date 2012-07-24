@@ -21,7 +21,15 @@ void setup();
 } //extern "C"
 #endif
 
-//Create a class  for the GestureHandler to use
+/**
+* The class which is responsible for the processing of all gestures.
+* 	This class is responsible for step 2 of the Mapocci gesture model.
+* 	The methods of this class contain all of the important algorithms
+*	used to classify gestures. There is one public method for each gesture
+*	and methods to feed the handler new data and to update its internal
+*	state. Main changes to future Mapocci's should be here. Each method
+*	documentation should contain a layout of the current algorithm used.
+*/
 class GestureHandler
 {
 	//The public methods for the GestureHandler which involve analyzing the raw data to see
@@ -44,80 +52,67 @@ class GestureHandler
 		void update();
 		
 	private:
-		sensorData rawData;
-		MapocciTransfer transfer;
+		sensorData rawData;			///<The storage place for all raw data, usually collected by a SensorHandler
+		MapocciTransfer transfer;	///<The transfer function object used in converting features to forces
 		
 		//Helper methods for shaking
 		bool testShake(int current[], float threshold);
 		
 		//Helper variables for shaking, save state and such
-		int pastAccel[3];
-		float filteredShake;
-		bool isShaking;
-		int shakeCount;
-		int shakePointer;
-		float shakingUpper;
-		float shakingLower;
-		float maxShaking;
-		int accelerometerNominal;
+		int pastAccel[3];	///<A storage place for previous acceleration data
+		float filteredShake;	///<A variable used to high pass filter the shake amplitude
+		bool isShaking;	///<The boolean determining shaking state
+		int shakeCount;	///<A counter used in hysterisis of shaking
+		float shakingUpper; ///<The upper threshold for shaking
+		float shakingLower;	///<The lower threshold for shaking
+		float maxShaking;	///<The ceiling of shaking amplitudes
+		int accelerometerNominal;	///<The nominal acceleration magnitude, corresponds to g
 		
 		//Helper methods for rotation
 		bool checkRotation(int axis);
 		
 		//Variables for rotation
-		int nominalRotation;
-		bool isSpinning;
-		bool isFlipping;
-		bool isRolling;
-		int rotationThreshold;
+		int nominalRotation;	///<The nominal value for no rotation on the gyroscope
+		bool isSpinning;	///<The boolean determining spinning state
+		bool isFlipping;	///<The boolean determining flipping state
+		bool isRolling;		///<The boolean determining rolling state
+		int rotationThreshold;	///<The threshold for rotation to be valid
 		
 		//Helper variables for falling
-		bool isFalling;
-		int fallCount;
+		bool isFalling; ///<The boolean determining falling state
+		int fallCount;	///<A counter used in hysterisis of falling
 		
 		//Helper variable for upside down
-		bool isUpsideDown;
+		bool isUpsideDown;	///<The boolean determining upsidedown state
 		
 		//Helper function for the touchPads
 		void getTouchPadFeatures(float means[], float stds[], int modes[]);
 
 		String getTouchGestureString(int i);
-		
+
 		//Helper variables for each of the touchPads
-		float means[3];
-		float stds[3];
-		int modes[3];
-		int sums[3];
+		float means[3]; ///<The mean touch locations of each fabric sensor
+		float stds[3]; ///<The standard deviations of touch on each fabric sensor
+		int modes[3]; ///<The location of the strongest touch on each fabric sensor
+		int sums[3]; ///<The sum of the pressure values for each fabric sensor
 		
-		int oldTorso[16];
-		int oldBottom[9];
-		int oldStomach[4];
-		
-		//Touch detection variables
-		int touchCount[3];
-		bool isTouching[3];
-		
+		int oldTorso[16]; ///<An array used to high pass filter torso data
+		int oldBottom[9];	///<An array used to high pass filter bottom data
+		int oldStomach[4];	///<An array used to high pass filter stomach data
+	
 		
 		//Tail detection helper variables
-		int tailThreshold;
-		
-		//Poke detection helper variables
-		float pokeStdThreshold;
-		int pokeModeThreshold;
-		
-		//Slap detection helper variables
-		float slapStdThreshold;
-		int slapModeThreshold;
+		int tailThreshold;	///<The capacitance threshold for the tail
 		
 		//Kiss detection helper variables
-		int kissThreshold;
+		int kissThreshold; ///<The capacitance threshold for the mouth
 
-		bool isTorso;
-		int torsoCount;
-		bool isBottom;
-		int bottomCount;
-		bool isStomach;
-		int stomachCount;
+		bool isTorso;	///<The boolean determining torso touch state
+		int torsoCount;	///<A counter used in hysterisis of torso touches
+		bool isBottom;	///<The boolean determining bottom touch state
+		int bottomCount; ///<A counter used in hysterisis of bottom touches
+		bool isStomach;	///<The boolean determining stomach touch state
+		int stomachCount; ///<A counter used in hysterisis of stomach touches
 		
 };
 

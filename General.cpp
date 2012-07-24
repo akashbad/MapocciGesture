@@ -14,7 +14,7 @@
 *		data overwritten
 *	@param read[] an array of ints to have the data read from,
 *		not mutated, must have size length at minimum
-*	@param length, an int representing the amount of data to be
+*	@param length an int representing the amount of data to be
 *		copied
 */
 void copyInt(int write[], int read[], int length)

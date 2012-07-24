@@ -8,7 +8,19 @@
 #include "GestureHandler.h"
 
 
-
+/**
+* A constructor for the GestureHandler class.
+*	This constructor sets up and initializes all of the private
+*	variables in the GestureHandler, including all of the important
+*	algorithm thresholds and state variables. In addition it also
+*	includes variables to hold on to a raw or processed history of
+*	some sensor data. Changes to variables here should produce changes
+*	in the sensitivity of gesture detection.
+*
+*	@param model an instance of the MapocciTransfer object which is used
+*		to transfer features to number understandable by the emotional model
+*
+*/
 GestureHandler::GestureHandler(MapocciTransfer model)
 {
 	transfer = model;
@@ -17,7 +29,6 @@ GestureHandler::GestureHandler(MapocciTransfer model)
 	isShaking = false;
 	filteredShake = 0.00;
 	shakeCount = 0;
-	shakePointer = 0;
 	shakingUpper = 15.0;
 	shakingLower = 10.0;
 	accelerometerNominal = 338;
@@ -35,15 +46,6 @@ GestureHandler::GestureHandler(MapocciTransfer model)
 	
 	//Upside down variable initialization
 	isUpsideDown = false;
-	
-	//Touch variable initialization
-	touchCount[0] = 0;
-	touchCount[1] = 0;
-	touchCount[2] = 0;
-	isTouching[0] = false;
-	isTouching[1] = false;
-	isTouching[2] = false;
-	Serial.println(isTouching[0]);
 
 	//Tail variable initialization
 	tailThreshold;
@@ -51,10 +53,27 @@ GestureHandler::GestureHandler(MapocciTransfer model)
 	//Kiss variable initialization
 	kissThreshold = 20;
 
+	//Touch detection initialization
 	isTorso=false;
 	torsoCount = 0;
+	isBottom=false;
+	bottomCount = 0;
+	isStomach=false;
+	stomachCount = 0;
 }
 
+/**
+* A method to feed new raw data into the GestureHandler.
+*	This allows the GestureHandler to have the most up to date
+*	data for this cycle. In addition there is some additional
+*	data processing here, including the smoothing or segmenting
+*	of different data. Here is also the correct place to print
+*	raw or slightly processed data for debugging. Finally,
+*	this method generates the features for each fabric sensor.
+*
+*	@param data the sensorData object containing the newest rawData
+*	@see getTouchPadFeatures()
+*/
 void GestureHandler::report(sensorData data)
 {
 	rawData = data;
@@ -102,6 +121,10 @@ void GestureHandler::report(sensorData data)
 
 //------------------------------------------------------------------------------
 /**
+* The public method to return shake gestures.
+*	This method uses an algorithm described 
+*	<a href="http://stackoverflow.com/questions/150446/how-do-i-detect-when-someone-shakes-an-iphone">
+*	here</a>. The basic idea of the algorithm is that it looks \ref
 *	@see testShake()
 *	@see ftos()
 */
@@ -187,44 +210,44 @@ String GestureHandler::getRotating()
 		gesture+=spin;
 	}
 	
-//	if(rotationAxis[1]&&!isFlipping)
-//	{
-//		float force = transfer.transferFlipping(abs(rawData.gyro[1] - nominalRotation));
-//		String flip = "Flip=initiated:Speed=" + ftos(force)+"!";
-//		gesture+=flip;
-//		isFlipping = true;
-//	}
-//	else if(!rotationAxis[1]&&isFlipping)
-//	{
-//		isFlipping = false;
-//		gesture+= "Flip=ended!";
-//	}
-//	else if(isFlipping)
-//	{
-//		float force = transfer.transferFlipping(abs(rawData.gyro[1] - nominalRotation));
-//		String flip = "Flip=initiated:Speed=" + ftos(force)+"!";
-//		gesture+=flip;
-//	}
-//	
-//	if(rotationAxis[2]&&!isRolling)
-//	{
-//		float force = transfer.transferRolling(abs(rawData.gyro[2] - nominalRotation));
-//		String roll = "Roll=initiated:Speed=" + ftos(force)+"!";
-//		gesture+=roll;
-//		isRolling = true;
-//	}
-//	else if(!rotationAxis[2]&&isRolling)
-//	{
-//		isRolling = false;
-//		gesture+= "Roll=ended!";
-//	}
-//	else if(isRolling)
-//	{
-//		float force = transfer.transferRolling(abs(rawData.gyro[2] - nominalRotation));
-//		String roll = "Roll=initiated:Speed=" + ftos(force)+"!";
-//		gesture+=roll;
-//	}
-
+/*	if(rotationAxis[1]&&!isFlipping)
+	{
+		float force = transfer.transferFlipping(abs(rawData.gyro[1] - nominalRotation));
+		String flip = "Flip=initiated:Speed=" + ftos(force)+"!";
+		gesture+=flip;
+		isFlipping = true;
+	}
+	else if(!rotationAxis[1]&&isFlipping)
+	{
+		isFlipping = false;
+		gesture+= "Flip=ended!";
+	}
+	else if(isFlipping)
+	{
+		float force = transfer.transferFlipping(abs(rawData.gyro[1] - nominalRotation));
+		String flip = "Flip=initiated:Speed=" + ftos(force)+"!";
+		gesture+=flip;
+	}
+	
+	if(rotationAxis[2]&&!isRolling)
+	{
+		float force = transfer.transferRolling(abs(rawData.gyro[2] - nominalRotation));
+		String roll = "Roll=initiated:Speed=" + ftos(force)+"!";
+		gesture+=roll;
+		isRolling = true;
+	}
+	else if(!rotationAxis[2]&&isRolling)
+	{
+		isRolling = false;
+		gesture+= "Roll=ended!";
+	}
+	else if(isRolling)
+	{
+		float force = transfer.transferRolling(abs(rawData.gyro[2] - nominalRotation));
+		String roll = "Roll=initiated:Speed=" + ftos(force)+"!";
+		gesture+=roll;
+	}
+*/
 	return gesture;
 }
 
@@ -340,7 +363,6 @@ String GestureHandler::getTorso()
 		gesture+= getTouchGestureString(i);
 		return gesture;
 	}
-	touchCount[i] = torsoCount;
 	return gesture;
 }
 
@@ -378,7 +400,6 @@ String GestureHandler::getBottom()
 		gesture+= getTouchGestureString(i);
 		return gesture;
 	}
-	touchCount[i] = bottomCount;
 	return gesture;
 }
 
@@ -416,7 +437,6 @@ String GestureHandler::getStomach()
 		gesture+= getTouchGestureString(i);
 		return gesture;
 	}
-	touchCount[i] = stomachCount;
 	return gesture;
 }
 
