@@ -121,5 +121,23 @@ The matlab code in full is included here:
 
 
 ###Looking at Gesture Output			{#gesture_output}
-###Testing Gesture Algorithm			{#gesture_algorithm}
+If all you want to do is look at the gesture output, you should go to the arduino sketch you are running these libraries from. An example sketch is shown on the [Main Page](@ref index). In this sketch you would want to add the final line in order to see the print out of the gestures.
+
+	Serial.println(gestures);
+
+Or if you prefer to only print positive identifications:
+
+	if(gestures!="") Serial.println(gestures);
+
+Looking at this output can give you a sense of what would activate a gesture on the Mapocci and help in the adjustment of thresholds to fine tune gesture responsiveness. If the behavior seems entirely erratic see @ref gesture_algorithm on the algorithms page to see how to debug the algorithm itself.
+
 ###Known Hardware Issues			{#issues}
+This is a list of known hardware issues and non-permanent solutions that have been figured out to work around them. Of special note are the known hardware issues with the fabric sensors, which should be taken into account when designing future Mapoccis and sensing networks.
+
+####Shorting between GND and VCC		{#shorting}
+	If the Mapocci is running but frequently seems to disconnect from the computer even when the cable is plugged in, the arduino has probably reset because there is a short. The arduino has very good circuitry to save itself in the case of a short so you shouldn't worry if this happens occasionally. What probably happened was that one of the exposed pins on external hardware touched the base of the arduino or another ground area. Try to isolate "live" wires as much as possible by cutting long leads and securing things into place. If this does happen disconnect and recconect the arduino (it might take a few times) in order to get it reconnected to the computer.
+
+####Fabric Sensor Noise			{#fab_noise}
+	If you are looking at the data or visualization from the fabric sensor and you periodically see one of the wires jump to a high voltage there is likely one of a couple different kinds of disconnections. The op-amp will do this when it sees a 0 on the sensor wire so these spikes mean something is disconnected. If all of the sensors on a fabric are high it probably means the VCC is disconnected. Otherwise it probably means the hard soft joint of the sensor in question is too weak. The best way to prevent against this happening is to provide strain relief for the hard soft connections and make sure that they are sewn down well so they cannot move very much.
+
+

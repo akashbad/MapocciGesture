@@ -83,3 +83,13 @@ return "";
 This count variable presents significant room for modification to the functioning of these algorithms. By changing the amount the count is incremented by and the count threshold for different conditions one can change a gesture's tendency to be recognized as well as how easy it is to stop the gesture.
 
 Most importantly, however, this count allows us to filter out random noise that might otherwise cause a gesture, and it will allow gestures to be sufficiently well segmented in time.
+
+###Testing Gesture Algorithm			{#gesture_algorithm}
+This is probably the most confusing and annoying thing to work with in these libraries, especially because something about our current configuration is causing strange effects to the code. For example, GestureHandler::randomMemoryPlaceholder0 and GestureHandler::randomMemoryPlaceholder1 are floats that have been created for no other reason than the fact that allocating those variables memory space allows the arduino to print messages across serial. The fact that the gesture recognition system for the fabrics uses 6 different variables instead of 2 arrays of 3 is also because of some strange behavior on the arduino.
+
+Nevertheless, coming up with these workarounds is not too difficult, what is harder is trying to find out where the problem.
+Because the use of arduino prohibits us from using an IDE as a debugger plan on debugging with print statements. 
+
+If a piece of an algorithm is acting strangely (printing repeated ending messages without any initated messages for example) go into each conditional statement and print a message. This will allow you to see which blocks the code is going inside of. Check to see that the test_case, the state, and the count are what you would expect inside of each of these blocks. If things are amiss try commenting in and out blocks of code to see how it changes the behavior and ideally isolate the problem. If you still can't get it to work try replacing some of the more complicated features (arrays and long conditionals) with simple ones. Check that the algorithm works with simpler features so you have a better idea of where to look.
+
+Overall the idea is print, observe, change. Hopefully doing so will allow you to isolate the problem and fix it or come up with a workaround if the problem seems unintelligible.
