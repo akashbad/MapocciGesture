@@ -117,6 +117,8 @@ class GestureHandler
 		bool isStomach;	///<The boolean determining stomach touch state
 		int stomachCount; ///<A counter used in hysterisis of stomach touches
 		
+		float randomMemoryPlaceholder0; ///<For some reason we need this to work...
+		float randomMemoryPlaceholder1; ///<For some reason we need this to work...
 };
 
 #endif

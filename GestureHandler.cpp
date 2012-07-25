@@ -94,22 +94,22 @@ void GestureHandler::report(sensorData data)
 		oldTorso[i] = rawData.torso[i] > 20 ? rawData.torso[i] : 0;
 	}
 	
-	// for(int i=0; i<16; i++)
-	// {
-	// 	Serial.print(oldTorso[i]);
-	// 	Serial.print('\t');
-	// }
-	// for(int i=0; i<9; i++)
-	// {
-	// 	Serial.print(oldBottom[i]);
-	// 	Serial.print('\t');
-	// }
-	// 	for(int i=0; i<14; i++)
-	// {
-	// 	Serial.print(oldStomach[i]);
-	// 	Serial.print('\t');
-	// }
-	// Serial.println("");
+	for(int i=0; i<16; i++)
+	{
+		Serial.print(oldTorso[i]);
+		Serial.print('\t');
+	}
+	for(int i=0; i<9; i++)
+	{
+		Serial.print(oldBottom[i]);
+		Serial.print('\t');
+	}
+		for(int i=0; i<14; i++)
+	{
+		Serial.print(oldStomach[i]);
+		Serial.print('\t');
+	}
+	Serial.println("");
 	
 	getTouchPadFeatures();
 }
