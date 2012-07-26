@@ -603,11 +603,11 @@ String GestureHandler::getTailTouch()
 	if(rawData.tail<tailThreshold&&isTailTouching)
 	{
 		isTailTouching = false;
-		return "Tail=ended";
+		return "Tail=ended!";
 	}
 	if(isTailTouching)
 	{
-		return "Tail=initiated";
+		return "Tail=initiated!";
 	}
 	return "";
 }
@@ -632,11 +632,11 @@ String GestureHandler::getKiss()
 	if(rawData.mouth<kissThreshold&&isKissing)
 	{
 		isKissing = false;
-		return "Kiss=ended";
+		return "Kiss=ended!";
 	}
 	if(isKissing)
 	{
-		return "Kiss=initiated";
+		return "Kiss=initiated!";
 	}
 	return "";
 }
