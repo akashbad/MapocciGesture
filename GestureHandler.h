@@ -54,7 +54,9 @@ class GestureHandler
 		//Kiss detection helper variables
 		int kissThreshold; ///<The capacitance threshold for the mouth
 		bool isKissing; ///<The boolean determining mouth touch state
-		
+
+		bool isTailTouching;
+
 	private:
 		sensorData rawData;			///<The storage place for all raw data, usually collected by a SensorHandler
 		MapocciTransfer transfer;	///<The transfer function object used in converting features to forces
@@ -108,7 +110,7 @@ class GestureHandler
 	
 		//Tail detection helper variables
 		int tailThreshold;	///<The capacitance threshold for the tail
-		bool isTailTouching; ///<The boolean determining tail touch state
+		//bool isTailTouching; ///<The boolean determining tail touch state
 		
 		bool isTorso;	///<The boolean determining torso touch state
 		int torsoCount;	///<A counter used in hysterisis of torso touches

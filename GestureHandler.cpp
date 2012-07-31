@@ -51,7 +51,7 @@ GestureHandler::GestureHandler(MapocciTransfer model)
 
 	//Tail variable initialization
 	tailThreshold = 25;
-	isTailTouching = false;
+	isTailTouching = true;
 	
 	//Kiss variable initialization
 	kissThreshold = 16;
@@ -123,6 +123,7 @@ void GestureHandler::report(sensorData data)
 	// }
 	// Serial.println("");
 	getTouchPadFeatures();
+
 }
 
 /**
@@ -675,4 +676,5 @@ void GestureHandler::update()
 {
 	//Copy over the rest of the data
 	copyInt(pastAccel, rawData.accel, 3);
+	Serial.println(isTailTouching);
 }
