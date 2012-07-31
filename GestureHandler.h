@@ -52,6 +52,7 @@ class GestureHandler
 		void update();
 
 		bool isKissing;
+		int kissThreshold;
 		
 	private:
 		sensorData rawData;			///<The storage place for all raw data, usually collected by a SensorHandler
@@ -109,7 +110,7 @@ class GestureHandler
 		bool isTailTouching; ///<The boolean determining tail touch state
 		
 		//Kiss detection helper variables
-		int kissThreshold; ///<The capacitance threshold for the mouth
+		//int kissThreshold; ///<The capacitance threshold for the mouth
 		//bool isKissing; ///<The boolean determining mouth touch state
 
 		bool isTorso;	///<The boolean determining torso touch state

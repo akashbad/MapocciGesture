@@ -52,7 +52,8 @@ GestureHandler::GestureHandler(MapocciTransfer model)
 	tailThreshold;
 	
 	//Kiss variable initialization
-	kissThreshold = 20;
+	kissThreshold = 16;
+	isKissing = false;
 
 	//Touch detection initialization
 	isTorso=false;
@@ -110,7 +111,6 @@ void GestureHandler::report(sensorData data)
 	// 	Serial.print('\t');
 	// }
 	// Serial.println("");
-	
 	getTouchPadFeatures();
 }
 
@@ -624,7 +624,6 @@ String GestureHandler::getTailTouch()
 */
 String GestureHandler::getKiss()
 {
-	Serial.println(isKissing);
 	if(rawData.mouth>kissThreshold&&!isKissing)
 	{
 		isKissing = true;
