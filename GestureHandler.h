@@ -51,8 +51,9 @@ class GestureHandler
 		
 		void update();
 
-		bool isKissing;
-		int kissThreshold;
+		//Kiss detection helper variables
+		int kissThreshold; ///<The capacitance threshold for the mouth
+		bool isKissing; ///<The boolean determining mouth touch state
 		
 	private:
 		sensorData rawData;			///<The storage place for all raw data, usually collected by a SensorHandler
