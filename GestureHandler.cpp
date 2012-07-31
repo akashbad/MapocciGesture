@@ -38,7 +38,7 @@ GestureHandler::GestureHandler(MapocciTransfer model)
 	isSpinning = false;
 	isRolling = false;
 	isFlipping = false;
-	rotationThreshold = 100;
+	rotationThreshold = 150;
 	
 	//Falling variable initialization
 	isFalling = false;
@@ -228,7 +228,7 @@ String GestureHandler::getRotating()
 	}
 	String gesture = "";
 	
-	if(rotationAxis[0]&&!isSpinning)
+	if(rotationAxis[0]&&!isSpinning&&!isShaking)
 	{
 		float force = transfer.transferSpinning(abs(rawData.gyro[0] - nominalRotation));
 		String spin = "Spin=initiated:Speed=" + ftos(force)+"!";
@@ -322,7 +322,7 @@ String GestureHandler::getFalling()
 		isFalling = true;
 		return "Falling=initiated!";
 	}
-	if(isFalling&&magnitude >fallThresholdHigh)
+	if(isFalling&&magnitude > fallThresholdHigh)
 	{
 		isFalling = false;
 		return "Falling=ended!";
