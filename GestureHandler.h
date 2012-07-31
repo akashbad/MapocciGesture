@@ -51,6 +51,8 @@ class GestureHandler
 		
 		void update();
 		
+		//bool isUpsideDown;
+
 	private:
 		sensorData rawData;			///<The storage place for all raw data, usually collected by a SensorHandler
 		MapocciTransfer transfer;	///<The transfer function object used in converting features to forces
@@ -84,6 +86,7 @@ class GestureHandler
 		int fallThresholdLow; ///<The lower threshold for falling
 
 		//Helper variable for upside down
+		int upsideDownThreshold; ///<The threshold used for upside down detection
 		bool isUpsideDown;	///<The boolean determining upsidedown state
 		
 		//Helper function for the touchPads

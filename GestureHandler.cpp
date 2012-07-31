@@ -46,13 +46,14 @@ GestureHandler::GestureHandler(MapocciTransfer model)
 	fallThresholdLow = 10.0;
 	
 	//Upside down variable initialization
+	upsideDownThreshold = 290;
 	isUpsideDown = false;
 
 	//Tail variable initialization
 	tailThreshold;
 	
 	//Kiss variable initialization
-	kissThreshold = 20;
+	kissThreshold = 16;
 
 	//Touch detection initialization
 	isTorso=false;
@@ -105,14 +106,20 @@ void GestureHandler::report(sensorData data)
 	// 	Serial.print('\t');
 	// }
 	// 	for(int i=0; i<14; i++)
-	// {
+	// 
 	// 	Serial.print(oldStomach[i]);
 	// 	Serial.print('\t');
 	// }
 	// Serial.println("");
 	
-	// Serial.println(rawData.tail);
+	// Serial.println(rawData.mouth);
 
+	// for(int i=0; i<3; i++)
+	// {
+	// 	Serial.print(rawData.accel[i]);
+	// 	Serial.print('\t');
+	// }
+	// Serial.println("");
 	getTouchPadFeatures();
 }
 
@@ -389,6 +396,20 @@ void GestureHandler::getTouchPadFeatures()
 */
 String GestureHandler::getUpsideDown()
 {
+	if(rawData.accel[2]<upsideDownThreshold&&!isUpsideDown&&!isShaking)
+	{
+		isUpsideDown = true;
+		return "Upside-Down=initated!";
+	}
+	if(rawData.accel[2]>upsideDownThreshold&&isUpsideDown)
+	{
+		isUpsideDown = false;
+		return "Upside-Down=ended!";
+	}
+	if(isUpsideDown)
+	{
+		return "Upside-Down=initiated!";
+	}
 	return "";
 }
 
