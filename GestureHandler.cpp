@@ -113,7 +113,7 @@ void GestureHandler::report(sensorData data)
 	// }
 	// Serial.println("");
 	
-	// Serial.println(rawData.mouth);
+	// Serial.println(rawData.tail);
 
 	// for(int i=0; i<3; i++)
 	// {

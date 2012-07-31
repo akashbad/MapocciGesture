@@ -15,16 +15,17 @@ In order to appropriately integrate this code with the rest of the project move 
 
 //Declare the correct pins for all of the sensors
 int Apins[] = {0,1,2};
-int Gpins[] = {3,14,15};
-int FpinT = 10;
-int FpinB = 8;
-int FpinS = 7;
-int ConTpins[] = {28,26,24,22};
-int ConBpins[] = {4,5,6,7};
-int ConSpins[] = {30,32,34,36};
-int tPin = 13;
-int mPin = 49;
-int btPins[] = {47,45,43};
+int Gpins[] = {3,4,5};
+int FpinT = 8;
+int FpinB = 15;
+int FpinS = 9;
+int ConTpins[] = {48,46,44,42};
+int ConBpins[] = {28,26,24,22};
+int ConSpins[] = {49,47,45,43}; 
+int tPin = 32;
+int mPin = 34;
+int btPins[] = {36,40,38};
+int ledPins[] = {4,5,6};
 
 //Create instances of the necessary objects
 SensorHandler sHandler(Apins, Gpins, FpinT, FpinS, FpinB, ConTpins,ConSpins, ConBpins, tPin, mPin, btPins);
