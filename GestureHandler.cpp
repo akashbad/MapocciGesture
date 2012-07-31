@@ -676,5 +676,4 @@ void GestureHandler::update()
 {
 	//Copy over the rest of the data
 	copyInt(pastAccel, rawData.accel, 3);
-	Serial.println(isTailTouching);
 }
