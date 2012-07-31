@@ -94,19 +94,40 @@ void GestureHandler::report(sensorData data)
 		oldTorso[i] = rawData.torso[i] > 20 ? rawData.torso[i] : 0;
 	}
 	
+
+	//The super printing block
+	for(int i=0; i<3; i++)
+	{
+		Serial.print(rawData.accel[i]);
+		Serial.print('\t');
+	}
+	for(int i=0; i<1; i++)
+	{
+		Serial.print(rawData.gyro[i]);
+		Serial.print('\t');
+	}
 	for(int i=0; i<16; i++)
 	{
-		Serial.print(oldTorso[i]);
+		Serial.print(rawData.torso[i]);
 		Serial.print('\t');
 	}
 	for(int i=0; i<9; i++)
 	{
-		Serial.print(oldBottom[i]);
+		Serial.print(rawData.bottom[i]);
 		Serial.print('\t');
 	}
-		for(int i=0; i<14; i++)
+	for(int i=0; i<14; i++)
 	{
-		Serial.print(oldStomach[i]);
+		Serial.print(rawData.stomach[i]);
+		Serial.print('\t');
+	}
+	Serial.print(rawData.tail);
+	Serial.print('\t');
+	Serial.print(rawData.mouth);
+	Serial.print('\t');
+	for(int i=0; i<3; i++)
+	{
+		Serial.print(rawData.bodyTouches[i]);
 		Serial.print('\t');
 	}
 	Serial.println("");
