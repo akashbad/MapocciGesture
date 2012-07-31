@@ -50,6 +50,10 @@ class GestureHandler
 		String getKiss();
 		
 		void update();
+
+		//Kiss detection helper variables
+		int kissThreshold; ///<The capacitance threshold for the mouth
+		bool isKissing; ///<The boolean determining mouth touch state
 		
 		//bool isUpsideDown;
 
@@ -110,8 +114,8 @@ class GestureHandler
 		bool isTailTouching; ///<The boolean determining tail touch state
 		
 		//Kiss detection helper variables
-		int kissThreshold; ///<The capacitance threshold for the mouth
-		bool isKissing; ///<The boolean determining mouth touch state
+		//int kissThreshold; ///<The capacitance threshold for the mouth
+		//bool isKissing; ///<The boolean determining mouth touch state
 
 		bool isTorso;	///<The boolean determining torso touch state
 		int torsoCount;	///<A counter used in hysterisis of torso touches

@@ -54,6 +54,7 @@ GestureHandler::GestureHandler(MapocciTransfer model)
 	
 	//Kiss variable initialization
 	kissThreshold = 16;
+	isKissing = false;
 
 	//Touch detection initialization
 	isTorso=false;
@@ -106,7 +107,7 @@ void GestureHandler::report(sensorData data)
 	// 	Serial.print('\t');
 	// }
 	// 	for(int i=0; i<14; i++)
-	// 
+	// {
 	// 	Serial.print(oldStomach[i]);
 	// 	Serial.print('\t');
 	// }

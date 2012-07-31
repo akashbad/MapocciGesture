@@ -73,7 +73,7 @@ String Gesture::process(GestureHandler *pHandler, sensorData data)
 	// results+= handler.getBottom();
 	// results+= handler.getStomach();
 	// results+= handler.getTailTouch();
-	// results+= handler.getKiss();
+	results+= handler.getKiss();
 	handler.update();
 	*pHandler = handler;
 	return (results);
