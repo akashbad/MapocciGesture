@@ -50,7 +50,8 @@ GestureHandler::GestureHandler(MapocciTransfer model)
 	isUpsideDown = false;
 
 	//Tail variable initialization
-	tailThreshold;
+	tailThreshold = 25;
+	isTailTouching = false;
 	
 	//Kiss variable initialization
 	kissThreshold = 16;
