@@ -52,8 +52,8 @@ SensorHandler::SensorHandler(int Apins[], int Gpins[], int FpinT, int FpinS, int
 		copyInt(bodyTouchPins, btPins,3);
 		
 		//initialize the fabric processing values
-		deadPixThreshold = 250;
-		fabricScaleFactor = 270;
+		deadPixThreshold = 1024; //250;
+		fabricScaleFactor = 0; //270;
 		
 		//Set the multiplexer pins to output
 		for(int i = 0; i<4; i++)
@@ -109,7 +109,7 @@ void SensorHandler::getTorsoData(int data[])
 {
 	for(int i=0; i<16; i++)
 	{
-		fabricMultiplexer(i, torsoControl);
+		fabricMultiplexer(15-i, torsoControl);
 		int temp = analogRead(torsoPin)-fabricScaleFactor;
 		data[i] = temp > 0 ? temp : 0;
 	}
