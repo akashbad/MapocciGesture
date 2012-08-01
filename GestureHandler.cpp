@@ -99,36 +99,36 @@ void GestureHandler::report(sensorData data)
 	for(int i=0; i<3; i++)
 	{
 		Serial.print(rawData.accel[i]);
-		Serial.print('\t');
+		Serial.print(" ");
 	}
 	for(int i=0; i<1; i++)
 	{
 		Serial.print(rawData.gyro[i]);
-		Serial.print('\t');
+		Serial.print(" ");
 	}
 	for(int i=0; i<16; i++)
 	{
 		Serial.print(rawData.torso[i]);
-		Serial.print('\t');
+		Serial.print(" ");
 	}
 	for(int i=0; i<9; i++)
 	{
 		Serial.print(rawData.bottom[i]);
-		Serial.print('\t');
+		Serial.print(" ");
 	}
 	for(int i=0; i<14; i++)
 	{
 		Serial.print(rawData.stomach[i]);
-		Serial.print('\t');
+		Serial.print(" ");
 	}
 	Serial.print(rawData.tail);
-	Serial.print('\t');
+	Serial.print(" ");
 	Serial.print(rawData.mouth);
-	Serial.print('\t');
+	Serial.print(" ");
 	for(int i=0; i<3; i++)
 	{
 		Serial.print(rawData.bodyTouches[i]);
-		Serial.print('\t');
+		Serial.print(" ");
 	}
 	Serial.println("");
 	
