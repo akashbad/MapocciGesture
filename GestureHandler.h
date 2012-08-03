@@ -50,12 +50,13 @@ class GestureHandler
 		String getKiss();
 		
 		void update();
-		
+
+
 	private:
 		sensorData rawData;			///<The storage place for all raw data, usually collected by a SensorHandler
 		MapocciTransfer transfer;	///<The transfer function object used in converting features to forces
 		
-		//Helper methods for shaking
+				//Helper methods for shaking
 		bool testShake(int current[], float threshold);
 		
 		//Helper variables for shaking, save state and such
@@ -83,42 +84,68 @@ class GestureHandler
 		int fallThresholdHigh; ///<The the upper threshold for falling
 		int fallThresholdLow; ///<The lower threshold for falling
 
+
+
 		//Helper variable for upside down
+		int upsideDownThreshold; ///<The threshold used for upside down detection
 		bool isUpsideDown;	///<The boolean determining upsidedown state
-		
+
+		//Kiss detection helper variables
+		int kissThreshold; ///<The capacitance threshold for the mouth
+		bool isKissing; ///<The boolean determining mouth touch state
+
+
 		//Helper function for the touchPads
 		void getTouchPadFeatures();
 
 		String getTouchGestureString(int i);
 
+		
+		//Tail detection helper variables
+		int tailThreshold;	///<The capacitance threshold for the tail
+		bool isTailTouching; ///<The boolean determining tail touch state
+
+		bool isTorso;	///<The boolean determining torso touch state
+		int torsoCount;	///<A counter used in hysterisis of torso touches
+		int torsoCapThresh; ///<A threshold to determing capacitive touching on the torso
+		int torsoSumThresh;///<A threshold to determine pressure touching on the torso
+		bool isBottom;	///<The boolean determining bottom touch state
+		int bottomCount; //<A counter used in hysterisis of bottom touches
+		int bottomCapThresh; ///<A threshold to determing capacitive touching on the bottom
+		int bottomSumThresh;///<A threshold to determine pressure touching on the bottom
+		bool isStomach;	///<The boolean determining stomach touch state
+		int stomachCount; ///<A counter used in hysterisis of stomach touches
+		int stomachCapThresh; ///<A threshold to determing capacitive touching on the stomach
+		int stomachSumThresh;///<A threshold to determine pressure touching on the stomach
+
+		
 		//Helper variables for each of the touchPads
 		float means[3]; ///<The mean touch locations of each fabric sensor
 		float stds[3]; ///<The standard deviations of touch on each fabric sensor
 		int modes[3]; ///<The location of the strongest touch on each fabric sensor
 		int sums[3]; ///<The sum of the pressure values for each fabric sensor
-		
+
 		int oldTorso[16]; ///<An array used to high pass filter torso data
 		int oldBottom[9];	///<An array used to high pass filter bottom data
 		int oldStomach[4];	///<An array used to high pass filter stomach data
-	
-		
-		//Tail detection helper variables
-		int tailThreshold;	///<The capacitance threshold for the tail
-		bool isTailTouching; ///<The boolean determining tail touch state
-		
-		//Kiss detection helper variables
-		int kissThreshold; ///<The capacitance threshold for the mouth
-		bool isKissing; ///<The boolean determining mouth touch state
 
-		bool isTorso;	///<The boolean determining torso touch state
-		int torsoCount;	///<A counter used in hysterisis of torso touches
-		bool isBottom;	///<The boolean determining bottom touch state
-		int bottomCount; ///<A counter used in hysterisis of bottom touches
-		bool isStomach;	///<The boolean determining stomach touch state
-		int stomachCount; ///<A counter used in hysterisis of stomach touches
-		
 		float randomMemoryPlaceholder0; ///<For some reason we need this to work...
 		float randomMemoryPlaceholder1; ///<For some reason we need this to work...
+		float randomMemoryPlaceholder2; ///<For some reason we need this to work...
+		float randomMemoryPlaceholder3; ///<For some reason we need this to work...
+		float randomMemoryPlaceholder4; ///<For some reason we need this to work...
+		float randomMemoryPlaceholder5; ///<For some reason we need this to work...
+		float randomMemoryPlaceholder6; ///<For some reason we need this to work...
+		float randomMemoryPlaceholder7; ///<For some reason we need this to work...
+		float randomMemoryPlaceholder8; ///<For some reason we need this to work...
+		float randomMemoryPlaceholder9; ///<For some reason we need this to work...
+		float randomMemoryPlaceholder10; ///<For some reason we need this to work...
+		float randomMemoryPlaceholder11; ///<For some reason we need this to work...
+		float randomMemoryPlaceholder12; ///<For some reason we need this to work...
+		float randomMemoryPlaceholder13; ///<For some reason we need this to work...
+		float randomMemoryPlaceholder14; ///<For some reason we need this to work...
+
+
 };
 
 #endif
