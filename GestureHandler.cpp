@@ -50,7 +50,7 @@ GestureHandler::GestureHandler(MapocciTransfer model)
 	isUpsideDown = false;
 
 	//Tail variable initialization
-	tailThreshold = 25;
+	tailThreshold = 50;
 	isTailTouching = true;
 	
 	//Kiss variable initialization
@@ -60,10 +60,16 @@ GestureHandler::GestureHandler(MapocciTransfer model)
 	//Touch detection initialization
 	isTorso=false;
 	torsoCount = 0;
+	torsoCapThresh = 70;
+	torsoSumThresh = 100;
 	isBottom=false;
 	bottomCount = 0;
+	bottomCapThresh = 50;
+	bottomSumThresh = 200;
 	isStomach=false;
 	stomachCount = 0;
+	stomachCapThresh = 100;
+	stomachSumThresh = 50;
 }
 
 /**
@@ -96,34 +102,8 @@ void GestureHandler::report(sensorData data)
 	{
 		oldTorso[i] = rawData.torso[i] > 20 ? rawData.torso[i] : 0;
 	}
-	
-	// for(int i=0; i<16; i++)
-	// {
-	// 	Serial.print(oldTorso[i]);
-	// 	Serial.print('\t');
-	// }
-	// for(int i=0; i<9; i++)
-	// {
-	// 	Serial.print(oldBottom[i]);
-	// 	Serial.print('\t');
-	// }
-	// 	for(int i=0; i<14; i++)
-	// {
-	// 	Serial.print(oldStomach[i]);
-	// 	Serial.print('\t');
-	// }
-	// Serial.println("");
-	
-	// Serial.println(rawData.tail);
 
-	// for(int i=0; i<3; i++)
-	// {
-	// 	Serial.print(rawData.accel[i]);
-	// 	Serial.print('\t');
-	// }
-	// Serial.println("");
 	getTouchPadFeatures();
-
 }
 
 /**
@@ -438,7 +418,7 @@ String GestureHandler::getTorso()
 		pow(rawData.accel[1]-accelerometerNominal,2) + 
 		pow(rawData.accel[2]-accelerometerNominal,2));
 	int i = 0;
-	bool touchTest = rawData.bodyTouches[i] > 60 && sums[i] > 100;
+	bool touchTest = rawData.bodyTouches[i] > torsoCapThresh && sums[i] > torsoSumThresh;
 	if(touchTest&&!isTorso&&torsoCount==3)
 	{
 		isTorso = true;
@@ -490,7 +470,7 @@ String GestureHandler::getBottom()
 		pow(rawData.accel[1]-accelerometerNominal,2) + 
 		pow(rawData.accel[2]-accelerometerNominal,2));
 	int i = 1;
-	bool touchTest = rawData.bodyTouches[i] > 60;
+	bool touchTest = rawData.bodyTouches[i] > bottomCapThresh && sums[i] > bottomSumThresh;
 	if(touchTest&&!isBottom&&bottomCount==3)
 	{
 		isBottom = true;
@@ -542,7 +522,7 @@ String GestureHandler::getStomach()
 		pow(rawData.accel[1]-accelerometerNominal,2) + 
 		pow(rawData.accel[2]-accelerometerNominal,2));
 	int i = 2;
-	bool touchTest = rawData.bodyTouches[i] > 60;
+	bool touchTest = rawData.bodyTouches[i] > stomachCapThresh && sums[i] > stomachSumThresh;
 	if(touchTest&&!isStomach&&stomachCount==3)
 	{
 		isStomach = true;

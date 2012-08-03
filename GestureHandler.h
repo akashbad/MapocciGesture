@@ -107,10 +107,17 @@ class GestureHandler
 
 		bool isTorso;	///<The boolean determining torso touch state
 		int torsoCount;	///<A counter used in hysterisis of torso touches
+		int torsoCapThresh; ///<A threshold to determing capacitive touching on the torso
+		int torsoSumThresh;///<A threshold to determine pressure touching on the torso
 		bool isBottom;	///<The boolean determining bottom touch state
-		int bottomCount; ///<A counter used in hysterisis of bottom touches
+		int bottomCount; //<A counter used in hysterisis of bottom touches
+		int bottomCapThresh; ///<A threshold to determing capacitive touching on the bottom
+		int bottomSumThresh;///<A threshold to determine pressure touching on the bottom
 		bool isStomach;	///<The boolean determining stomach touch state
 		int stomachCount; ///<A counter used in hysterisis of stomach touches
+		int stomachCapThresh; ///<A threshold to determing capacitive touching on the stomach
+		int stomachSumThresh;///<A threshold to determine pressure touching on the stomach
+
 		
 		//Helper variables for each of the touchPads
 		float means[3]; ///<The mean touch locations of each fabric sensor
