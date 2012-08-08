@@ -54,7 +54,7 @@ GestureHandler::GestureHandler(MapocciTransfer model)
 	isTailTouching = true;
 	
 	//Kiss variable initialization
-	kissThreshold = 16;
+	kissThreshold = 20;
 	isKissing = false;
 
 	//Touch detection initialization
