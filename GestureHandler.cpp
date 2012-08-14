@@ -48,6 +48,10 @@ GestureHandler::GestureHandler(MapocciTransfer model)
 	//Upside down variable initialization
 	upsideDownThreshold = 290;
 	isUpsideDown = false;
+	standingUpThreshold = 400;
+	isStandingUp = false;
+	headDownThreshold = 290;
+	isHeadDown = false;
 
 	//Tail variable initialization
 	tailThreshold = 50;
@@ -392,6 +396,64 @@ String GestureHandler::getUpsideDown()
 	if(isUpsideDown)
 	{
 		return "Upside-Down=initiated!";
+	}
+	return "";
+}
+
+/**
+* The method to check if the Mapocci is standing up.
+*	This method uses a version of the general gesture algorithm with hysterisis, which
+*	is explained in more depth on the @ref algorithms page. The test condition
+*	of this gesture is the acceleration on the y-axis of the accelerometer
+*	which should change greatly in magnitude if the Mapocci is standing up.
+*
+*	@return an empty String if no gesture is detected or "Standing-Up=initated" or
+*		"Standing-Up=ended" gesture if one is detected.
+*/
+String GestureHandler::getStandingUp()
+{
+	if(rawData.accel[1]>standingUpThreshold&&!isStandingUp&&!isShaking)
+	{
+		isStandingUp = true;
+		return "Standing-Up=initated!";
+	}
+	if(rawData.accel[1]<standingUpThreshold&&isStandingUp)
+	{
+		isStandingUp = false;
+		return "Standing-Up=ended!";
+	}
+	if(isStandingUp)
+	{
+		return "Standing-Up=initiated!";
+	}
+	return "";
+}
+
+/**
+* The method to check if the Mapocci is head down.
+*	This method uses a version of the general gesture algorithm with hysterisis, which
+*	is explained in more depth on the @ref algorithms page. The test condition
+*	of this gesture is the acceleration on the y-axis of the accelerometer
+*	which should change greatly in magnitude if the Mapocci is head down.
+*
+*	@return an empty String if no gesture is detected or "Head_Down=initated" or
+*		"Head_Down=ended" gesture if one is detected.
+*/
+String GestureHandler::getHeadDown()
+{
+	if(rawData.accel[1]<headDownThreshold&&!isHeadDown&&!isShaking)
+	{
+		isHeadDown = true;
+		return "Head-Down=initated!";
+	}
+	if(rawData.accel[1]>headDownThreshold&&isHeadDown)
+	{
+		isHeadDown = false;
+		return "Head-Down=ended!";
+	}
+	if(isHeadDown)
+	{
+		return "Head-Down=initiated!";
 	}
 	return "";
 }

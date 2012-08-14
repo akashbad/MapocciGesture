@@ -43,6 +43,8 @@ class GestureHandler
 		String getRotating();
 		String getFalling();
 		String getUpsideDown();
+		String getStandingUp();
+		String getHeadDown();
 		String getTorso();
 		String getBottom();
 		String getStomach();
@@ -89,6 +91,10 @@ class GestureHandler
 		//Helper variable for upside down
 		int upsideDownThreshold; ///<The threshold used for upside down detection
 		bool isUpsideDown;	///<The boolean determining upsidedown state
+		int standingUpThreshold; ///<The threshold used for standing up detection
+		bool isStandingUp;	///<The boolean determining standing up state
+		int headDownThreshold; ///<The threshold used for head down detection
+		bool isHeadDown;	///<The boolean determining head down state
 
 		//Kiss detection helper variables
 		int kissThreshold; ///<The capacitance threshold for the mouth
