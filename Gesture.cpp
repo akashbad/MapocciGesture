@@ -8,7 +8,6 @@
 //#include "Sender.h"
 #include "General.h"
 #include "Gesture.h"
-#include <string>
 
 
 /**
