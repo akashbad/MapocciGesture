@@ -52,8 +52,8 @@ SensorHandler::SensorHandler(int Apins[], int Gpins[], int FpinT, int FpinS, int
 		copyInt(bodyTouchPins, btPins,3);
 		
 		//initialize the fabric processing values
-		deadPixThreshold = 1024; //250;
-		fabricScaleFactor = 0; //270;
+		deadPixThreshold = 250;
+		fabricScaleFactor = 270;
 		
 		//Set the multiplexer pins to output
 		for(int i = 0; i<4; i++)

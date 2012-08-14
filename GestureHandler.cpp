@@ -38,7 +38,7 @@ GestureHandler::GestureHandler(MapocciTransfer model)
 	isSpinning = false;
 	isRolling = false;
 	isFlipping = false;
-	rotationThreshold = 100;
+	rotationThreshold = 150;
 	
 	//Falling variable initialization
 	isFalling = false;
@@ -46,21 +46,34 @@ GestureHandler::GestureHandler(MapocciTransfer model)
 	fallThresholdLow = 10.0;
 	
 	//Upside down variable initialization
+	upsideDownThreshold = 290;
 	isUpsideDown = false;
+	standingUpThreshold = 390;
+	isStandingUp = false;
+	headDownThreshold = 280;
+	isHeadDown = false;
 
 	//Tail variable initialization
-	tailThreshold;
+	tailThreshold = 50;
+	isTailTouching = true;
 	
 	//Kiss variable initialization
 	kissThreshold = 20;
+	isKissing = false;
 
 	//Touch detection initialization
 	isTorso=false;
 	torsoCount = 0;
+	torsoCapThresh = 100;
+	torsoSumThresh = 100;
 	isBottom=false;
 	bottomCount = 0;
+	bottomCapThresh = 60;
+	bottomSumThresh = 50;
 	isStomach=false;
 	stomachCount = 0;
+	stomachCapThresh = 120;
+	stomachSumThresh = 50;
 }
 
 /**
@@ -93,8 +106,6 @@ void GestureHandler::report(sensorData data)
 	{
 		oldTorso[i] = rawData.torso[i] > 20 ? rawData.torso[i] : 0;
 	}
-	
-
 	//The super printing block
 	for(int i=0; i<3; i++)
 	{
@@ -131,8 +142,8 @@ void GestureHandler::report(sensorData data)
 		Serial.print(" ");
 	}
 	Serial.println("");
-	
 	getTouchPadFeatures();
+
 }
 
 /**
@@ -247,7 +258,7 @@ String GestureHandler::getRotating()
 	}
 	String gesture = "";
 	
-	if(rotationAxis[0]&&!isSpinning)
+	if(rotationAxis[0]&&!isSpinning&&!isShaking)
 	{
 		float force = transfer.transferSpinning(abs(rawData.gyro[0] - nominalRotation));
 		String spin = "Spin=initiated:Speed=" + ftos(force)+"!";
@@ -341,7 +352,7 @@ String GestureHandler::getFalling()
 		isFalling = true;
 		return "Falling=initiated!";
 	}
-	if(isFalling&&magnitude >fallThresholdHigh)
+	if(isFalling&&magnitude > fallThresholdHigh)
 	{
 		isFalling = false;
 		return "Falling=ended!";
@@ -408,6 +419,78 @@ void GestureHandler::getTouchPadFeatures()
 */
 String GestureHandler::getUpsideDown()
 {
+	if(rawData.accel[2]<upsideDownThreshold&&!isUpsideDown&&!isShaking)
+	{
+		isUpsideDown = true;
+		return "Upside-Down=initated!";
+	}
+	if(rawData.accel[2]>upsideDownThreshold&&isUpsideDown)
+	{
+		isUpsideDown = false;
+		return "Upside-Down=ended!";
+	}
+	if(isUpsideDown)
+	{
+		return "Upside-Down=initiated!";
+	}
+	return "";
+}
+
+/**
+* The method to check if the Mapocci is standing up.
+*	This method uses a version of the general gesture algorithm with hysterisis, which
+*	is explained in more depth on the @ref algorithms page. The test condition
+*	of this gesture is the acceleration on the y-axis of the accelerometer
+*	which should change greatly in magnitude if the Mapocci is standing up.
+*
+*	@return an empty String if no gesture is detected or "Standing-Up=initated" or
+*		"Standing-Up=ended" gesture if one is detected.
+*/
+String GestureHandler::getStandingUp()
+{
+	if(rawData.accel[0]>standingUpThreshold&&!isStandingUp&&!isShaking)
+	{
+		isStandingUp = true;
+		return "Standing-Up=initated!";
+	}
+	if(rawData.accel[0]<standingUpThreshold&&isStandingUp)
+	{
+		isStandingUp = false;
+		return "Standing-Up=ended!";
+	}
+	if(isStandingUp)
+	{
+		return "Standing-Up=initiated!";
+	}
+	return "";
+}
+
+/**
+* The method to check if the Mapocci is head down.
+*	This method uses a version of the general gesture algorithm with hysterisis, which
+*	is explained in more depth on the @ref algorithms page. The test condition
+*	of this gesture is the acceleration on the y-axis of the accelerometer
+*	which should change greatly in magnitude if the Mapocci is head down.
+*
+*	@return an empty String if no gesture is detected or "Head_Down=initated" or
+*		"Head_Down=ended" gesture if one is detected.
+*/
+String GestureHandler::getHeadDown()
+{
+	if(rawData.accel[0]<headDownThreshold&&!isHeadDown&&!isShaking)
+	{
+		isHeadDown = true;
+		return "Head-Down=initated!";
+	}
+	if(rawData.accel[0]>headDownThreshold&&isHeadDown)
+	{
+		isHeadDown = false;
+		return "Head-Down=ended!";
+	}
+	if(isHeadDown)
+	{
+		return "Head-Down=initiated!";
+	}
 	return "";
 }
 
@@ -433,7 +516,7 @@ String GestureHandler::getTorso()
 		pow(rawData.accel[1]-accelerometerNominal,2) + 
 		pow(rawData.accel[2]-accelerometerNominal,2));
 	int i = 0;
-	bool touchTest = rawData.bodyTouches[i] > 60 && sums[i] > 100;
+	bool touchTest = rawData.bodyTouches[i] > torsoCapThresh && sums[i] > torsoSumThresh;
 	if(touchTest&&!isTorso&&torsoCount==3)
 	{
 		isTorso = true;
@@ -485,7 +568,7 @@ String GestureHandler::getBottom()
 		pow(rawData.accel[1]-accelerometerNominal,2) + 
 		pow(rawData.accel[2]-accelerometerNominal,2));
 	int i = 1;
-	bool touchTest = rawData.bodyTouches[i] > 60;
+	bool touchTest = rawData.bodyTouches[i] > bottomCapThresh && sums[i] > bottomSumThresh;
 	if(touchTest&&!isBottom&&bottomCount==3)
 	{
 		isBottom = true;
@@ -537,7 +620,7 @@ String GestureHandler::getStomach()
 		pow(rawData.accel[1]-accelerometerNominal,2) + 
 		pow(rawData.accel[2]-accelerometerNominal,2));
 	int i = 2;
-	bool touchTest = rawData.bodyTouches[i] > 60;
+	bool touchTest = rawData.bodyTouches[i] > stomachCapThresh && sums[i] > stomachSumThresh;
 	if(touchTest&&!isStomach&&stomachCount==3)
 	{
 		isStomach = true;
