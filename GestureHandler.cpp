@@ -48,9 +48,9 @@ GestureHandler::GestureHandler(MapocciTransfer model)
 	//Upside down variable initialization
 	upsideDownThreshold = 290;
 	isUpsideDown = false;
-	standingUpThreshold = 400;
+	standingUpThreshold = 390;
 	isStandingUp = false;
-	headDownThreshold = 290;
+	headDownThreshold = 280;
 	isHeadDown = false;
 
 	//Tail variable initialization
@@ -64,15 +64,15 @@ GestureHandler::GestureHandler(MapocciTransfer model)
 	//Touch detection initialization
 	isTorso=false;
 	torsoCount = 0;
-	torsoCapThresh = 70;
+	torsoCapThresh = 100;
 	torsoSumThresh = 100;
 	isBottom=false;
 	bottomCount = 0;
-	bottomCapThresh = 50;
-	bottomSumThresh = 200;
+	bottomCapThresh = 60;
+	bottomSumThresh = 50;
 	isStomach=false;
 	stomachCount = 0;
-	stomachCapThresh = 100;
+	stomachCapThresh = 120;
 	stomachSumThresh = 50;
 }
 
@@ -108,6 +108,7 @@ void GestureHandler::report(sensorData data)
 	}
 
 	getTouchPadFeatures();
+
 }
 
 /**
@@ -412,12 +413,12 @@ String GestureHandler::getUpsideDown()
 */
 String GestureHandler::getStandingUp()
 {
-	if(rawData.accel[1]>standingUpThreshold&&!isStandingUp&&!isShaking)
+	if(rawData.accel[0]>standingUpThreshold&&!isStandingUp&&!isShaking)
 	{
 		isStandingUp = true;
 		return "Standing-Up=initated!";
 	}
-	if(rawData.accel[1]<standingUpThreshold&&isStandingUp)
+	if(rawData.accel[0]<standingUpThreshold&&isStandingUp)
 	{
 		isStandingUp = false;
 		return "Standing-Up=ended!";
@@ -441,12 +442,12 @@ String GestureHandler::getStandingUp()
 */
 String GestureHandler::getHeadDown()
 {
-	if(rawData.accel[1]<headDownThreshold&&!isHeadDown&&!isShaking)
+	if(rawData.accel[0]<headDownThreshold&&!isHeadDown&&!isShaking)
 	{
 		isHeadDown = true;
 		return "Head-Down=initated!";
 	}
-	if(rawData.accel[1]>headDownThreshold&&isHeadDown)
+	if(rawData.accel[0]>headDownThreshold&&isHeadDown)
 	{
 		isHeadDown = false;
 		return "Head-Down=ended!";
