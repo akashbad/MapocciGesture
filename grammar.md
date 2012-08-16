@@ -42,6 +42,7 @@ Grammar 					{#definitions}
 Feature Information			{#features}
 -------------------
 For features, the following ranges apply:
+
 	0.0 < Acceleration < 100.0
 	0.0 < Speed < 100.0
 	0.0 < Pressure < 100.0
