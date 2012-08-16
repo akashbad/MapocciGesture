@@ -131,6 +131,17 @@ Or if you prefer to only print positive identifications:
 
 Looking at this output can give you a sense of what would activate a gesture on the Mapocci and help in the adjustment of thresholds to fine tune gesture responsiveness. If the behavior seems entirely erratic see @ref gesture_algorithm on the algorithms page to see how to debug the algorithm itself.
 
+###False Positives and Negatives 		{#false}
+This is always an issue within a gesture recognition system and these kinds of problems will likely be the vast majority of errors. Thankfully this is the easiest thing to debug and fix with just a few different techniques which are outlined here. 
+
+The first thing to do when dealing with false positives and negatives is to go to Gesture::proccess() and comment out the gesture(s) that are giving you problems. Test the system after this comment and ensure that all of the other gestures are still functional. This will ensure that it really is only an issue within the specific gesture and not a larger memory issue which may need to be addressed by @ref gesture_algorithm.
+
+Once you are sure it is really a matter of false positives and negatives (most likely) you want to make sure that the hardware is functional. If you are dealing with a gesture related to the capacitive sensors see the known @ref #cap_issues for the easy way of debugging this. In general the way to test is by @ref raw_data. Go to GestureHandler::report() and add print statements for the raw data in question, make sure to supress all other prints to prevent confusion. If things are abnormal that likely means something is disconnected, dig into the Mapocci and take a look for disconnected cables!
+
+If things seem normal, the next step is threshold adjustment. All of the thresholds can be found in GestureHandler::GestureHandler() where they are declared. For all touch related gestures increasing the thresholds will result in less false positives but potentially more false negatives.Other gestures may have different relations but it should be fairly easy to tell by looking at the code. You can adjust the gestures via a guess and check method or by @ref raw_data and seeing the values directly.
+
+If this still doesn't work that means there is a deeper software issue which requires further investigation.
+
 ###Known Hardware Issues			{#issues}
 This is a list of known hardware issues and non-permanent solutions that have been figured out to work around them. Of special note are the known hardware issues with the fabric sensors, which should be taken into account when designing future Mapoccis and sensing networks.
 
@@ -140,4 +151,6 @@ This is a list of known hardware issues and non-permanent solutions that have be
 ####Fabric Sensor Noise			{#fab_noise}
 	If you are looking at the data or visualization from the fabric sensor and you periodically see one of the wires jump to a high voltage there is likely one of a couple different kinds of disconnections. The op-amp will do this when it sees a 0 on the sensor wire so these spikes mean something is disconnected. If all of the sensors on a fabric are high it probably means the VCC is disconnected. Otherwise it probably means the hard soft joint of the sensor in question is too weak. The best way to prevent against this happening is to provide strain relief for the hard soft connections and make sure that they are sewn down well so they cannot move very much.
 
-
+####Capacitive Sensor Issues 	{#cap_issues}
+	Although the capacitive sensors are quite robust (especially their signal to noise ratio), there is one very common issue and being able
+	to recognize it will save a lot of trouble. If you are seeing a lot of @ref false for the touch gestures it is likely a problem with a capacitive sensor. If you are @ref raw_data and find that a capacitive sensor is giving the value of **16000** that means the **sensor is disconnected**! It may either be unplugged or have physically disconnected from the arduino or the power supply.

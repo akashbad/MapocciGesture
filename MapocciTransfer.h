@@ -50,6 +50,8 @@ class MapocciTransfer
 		float maxShaking; ///<The maximum shaking value
 		float minRotating; ///<The minimum rotation velocity
 		float maxRotating; ///<The maxium rotation velocity
+		float minPressure; ///<The minimum fabric sensor pressure
+		float maxPressure; ///<The maxium fabric sensor pressure
 };
 #endif
 

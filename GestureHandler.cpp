@@ -68,7 +68,7 @@ GestureHandler::GestureHandler(MapocciTransfer model)
 	torsoSumThresh = 100;
 	isBottom=false;
 	bottomCount = 0;
-	bottomCapThresh = 60;
+	bottomCapThresh = 70;
 	bottomSumThresh = 50;
 	isStomach=false;
 	stomachCount = 0;
@@ -107,7 +107,9 @@ void GestureHandler::report(sensorData data)
 		oldTorso[i] = rawData.torso[i] > 20 ? rawData.torso[i] : 0;
 	}
 
+
 	getTouchPadFeatures();
+
 
 }
 
