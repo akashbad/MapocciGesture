@@ -137,6 +137,7 @@ float fMean(int data[], int length)
 		mean+= data[i]*(float)i;
 	}
 	mean = mean/sum;
+	if(mean != mean) return 0;
 	return mean;
 }
 
