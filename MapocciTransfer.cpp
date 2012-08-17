@@ -21,6 +21,8 @@ MapocciTransfer::MapocciTransfer()
 	maxShaking = 220.0;
 	minRotating = 100;
 	maxRotating = 512;
+	minPressure = 50;
+	maxPressure = 300;
 }
 
 /**
@@ -76,7 +78,9 @@ float MapocciTransfer::transferSpinning(int velocity)
 */
 float MapocciTransfer::transferTouching(float pressure)
 {
-	return pressure;
+	if(pressure != pressure) return 0;
+	float force = constrain(pressure, minPressure, maxPressure);
+	return map(force, minPressure, maxPressure, minForce, maxForce);
 }
 /**
 * A method to transfer touching area to Mapocci
@@ -86,6 +90,7 @@ float MapocciTransfer::transferTouching(float pressure)
 */
 float MapocciTransfer::transferTouchArea(float std)
 {
+	if(std != std) return 0;
 	return std;
 }
 

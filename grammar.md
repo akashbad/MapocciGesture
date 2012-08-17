@@ -24,7 +24,8 @@ Grammar 					{#definitions}
 	END ::= TYPE "=ended"
 
 	TYPE ::= "Shaking" | "Spinning" | "Flipping" | "Rolling" | "Falling" | 
-		"Upside-Down" | "Touch-0" | "Touch-1" | "Touch-2" | "Tail" | "Kiss"
+		"Upside-Down" | "Standing-Up" | "Head-Down" | "Touch-0" | "Touch-1" |
+		"Touch-2" | "Tail" | "Kiss"
 
 	FEATURES ::= ":" (SHAKING_FEATURES | ROTATING_FEATURES | TOUCH_FEATURES)
 
@@ -37,3 +38,20 @@ Grammar 					{#definitions}
 	%f ::= float
 
 	%d ::= integer
+
+Feature Information			{#features}
+-------------------
+For features, the following ranges apply:
+
+	0.0 < Acceleration < 100.0
+	0.0 < Speed < 100.0
+	0.0 < Pressure < 100.0
+	For torso:
+		0.0 < Area < 8.0
+		0.0 < Position < 16.0
+	For bottom:
+		0.0 < Area < 4.5
+		0.0 < Position < 9.0
+	For stomach:
+		0.0 < Area < 7.0
+		0.0 < Position < 14.0

@@ -64,11 +64,11 @@ GestureHandler::GestureHandler(MapocciTransfer model)
 	//Touch detection initialization
 	isTorso=false;
 	torsoCount = 0;
-	torsoCapThresh = 100;
+	torsoCapThresh = 90;
 	torsoSumThresh = 100;
 	isBottom=false;
 	bottomCount = 0;
-	bottomCapThresh = 60;
+	bottomCapThresh = 70;
 	bottomSumThresh = 50;
 	isStomach=false;
 	stomachCount = 0;
@@ -106,6 +106,7 @@ void GestureHandler::report(sensorData data)
 	{
 		oldTorso[i] = rawData.torso[i] > 20 ? rawData.torso[i] : 0;
 	}
+
 	//The super printing block
 	for(int i=0; i<3; i++)
 	{
@@ -142,7 +143,9 @@ void GestureHandler::report(sensorData data)
 		Serial.print(" ");
 	}
 	Serial.println("");
+
 	getTouchPadFeatures();
+
 
 }
 

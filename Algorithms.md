@@ -84,6 +84,7 @@ This count variable presents significant room for modification to the functionin
 
 Most importantly, however, this count allows us to filter out random noise that might otherwise cause a gesture, and it will allow gestures to be sufficiently well segmented in time.
 
+
 ###Testing Gesture Algorithm			{#gesture_algorithm}
 This is probably the most confusing and annoying thing to work with in these libraries, especially because something about our current configuration is causing strange effects to the code. For example, GestureHandler::randomMemoryPlaceholder0 and GestureHandler::randomMemoryPlaceholder1 are floats that have been created for no other reason than the fact that allocating those variables memory space allows the arduino to print messages across serial. The fact that the gesture recognition system for the fabrics uses 6 different variables instead of 2 arrays of 3 is also because of some strange behavior on the arduino.
 

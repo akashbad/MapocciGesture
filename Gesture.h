@@ -11,7 +11,7 @@
 #include "GestureHandler.h"
 //#include "Sender.h"
 #include "General.h"
-#include <string>
+
 //End of the includes
 
 #ifdef __cplusplus
