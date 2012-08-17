@@ -99,7 +99,6 @@ If debugging the fabric sensors is your goal then this is the best place to star
 				Serial.print('\t');
 			}
 			Serial.println("");
-			
 2.	Startup Matlab and the Visualization
 	1.	Start matlab and create a variable to hold the serial port
 
@@ -134,7 +133,7 @@ The matlab code in full is included here:
 	        stem(data);
 	        axis([0 40 0 200]);
 	        drawnow;
-	    en
+	    end
 	end
 
 
