@@ -81,7 +81,25 @@ If debugging the fabric sensors is your goal then this is the best place to star
 1.	Make sure that the correct data will be printed.
 	1.	Start by assuring that all printing of sensor data is commented out or supressed
 	2.	Proceed to GestureHandler:report() and either add or uncomment code that will print the data in GestureHandler::oldTorso[], GestureHandler::oldBottom[], and GestureHandler::oldStomach[].
-	3.	This should print each data sequentially on the the same line, seperated by tabs. Finally add a new line to seperate each cycle by a newline
+	3.	This should print each data sequentially on the the same line, seperated by tabs. Finally add a new line to seperate each cycle by a newline. You can do this by copying the following code to the end of the GestureHandler::report() method
+
+			for(int i=0; i<16; i++)
+			{
+				Serial.print(rawData.torso[i]);
+				Serial.print('\t');
+			}
+			for(int i=0; i<9; i++)
+			{
+				Serial.print(rawData.bottom[i]);
+				Serial.print('\t');
+			}
+			for(int i=0; i<14; i++)
+			{
+				Serial.print(rawData.stomach[i]);
+				Serial.print('\t');
+			}
+			Serial.println("");
+			
 2.	Startup Matlab and the Visualization
 	1.	Start matlab and create a variable to hold the serial port
 

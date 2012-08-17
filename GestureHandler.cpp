@@ -64,7 +64,7 @@ GestureHandler::GestureHandler(MapocciTransfer model)
 	//Touch detection initialization
 	isTorso=false;
 	torsoCount = 0;
-	torsoCapThresh = 100;
+	torsoCapThresh = 90;
 	torsoSumThresh = 100;
 	isBottom=false;
 	bottomCount = 0;
